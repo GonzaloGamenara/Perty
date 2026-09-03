@@ -1,0 +1,31 @@
+{
+  "name": "perty",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Central de juegos para jugar en la tele con el celular como control",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n server,host,control -c cyan,magenta,green \"npm:dev:server\" \"npm:dev:host\" \"npm:dev:control\"",
+    "dev:server": "npm run dev -w @perty/server",
+    "dev:host": "npm run dev -w @perty/host",
+    "dev:control": "npm run dev -w @perty/controller",
+    "build": "npm run build -w @perty/host && npm run build -w @perty/controller",
+    "start": "npm run start -w @perty/server",
+    "typecheck": "tsc -b --pretty",
+    "test": "node --import tsx --test packages/games/test/*.test.ts",
+    "bots": "npm run bots -w @perty/server --"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "concurrently": "^9.1.2",
+    "tsx": "^4.20.3",
+    "typescript": "^5.9.2"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
+  }
+}

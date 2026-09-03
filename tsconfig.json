@@ -1,0 +1,31 @@
+{
+  "extends": "./tsconfig.base.json",
+  "include": [
+    "packages/*/src/**/*.ts",
+    "packages/*/test/**/*.ts",
+    "apps/server/src/**/*.ts",
+    "apps/host/src/**/*.ts",
+    "apps/host/src/**/*.tsx",
+    "apps/controller/src/**/*.ts",
+    "apps/controller/src/**/*.tsx",
+    "apps/host/src/**/*.d.ts",
+    "apps/controller/src/**/*.d.ts"
+  ],
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "types": [
+      "node"
+    ],
+    "paths": {
+      "@perty/protocol": [
+        "./packages/protocol/src/index.ts"
+      ],
+      "@perty/engine": [
+        "./packages/engine/src/index.ts"
+      ],
+      "@perty/games": [
+        "./packages/games/src/index.ts"
+      ]
+    }
+  }
+}
