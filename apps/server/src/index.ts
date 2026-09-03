@@ -12,7 +12,7 @@ import {
   type PlayerJoinAck,
   type SettingValues,
 } from '@perty/protocol';
-import { joinUrl, lanAddress, readNetConfig } from './net';
+import { joinUrl, lanAddress, originFromHeaders, readNetConfig } from './net';
 import { RoomStore } from './rooms';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -84,7 +84,7 @@ const store = new RoomStore(
       io.to(socketId).emit(EV.playerKicked, 'Entraste desde otro lado');
     },
   },
-  (code) => joinUrl(config, code),
+  (code, origin) => joinUrl(config, code, origin),
 );
 
 // ---------------------------------------------------------------------------
@@ -117,7 +117,8 @@ io.on('connection', (socket) => {
   // -- tele ------------------------------------------------------------------
 
   socket.on(EV.hostCreate, (_payload: unknown, ack: unknown) => {
-    const room = store.create();
+    // El QR sale de la URL por la que entró esta tele, no de una variable.
+    const room = store.create(originFromHeaders(socket.handshake.headers));
     room.hostSocketId = socket.id;
     Object.assign(session(socket), { code: room.code, role: 'host' });
     reply<HostCreateAck>(ack, {
@@ -133,6 +134,7 @@ io.on('connection', (socket) => {
     const room = store.get(payload?.code);
     if (!room || room.hostToken !== payload?.hostToken) return reply(ack, fail('Sala no encontrada'));
     room.hostSocketId = socket.id;
+    store.refreshJoinUrl(room, originFromHeaders(socket.handshake.headers));
     Object.assign(session(socket), { code: room.code, role: 'host' });
     reply<HostCreateAck>(ack, {
       ok: true,

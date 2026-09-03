@@ -50,6 +50,58 @@ npm run dev
 > server. Si querés jugar con alguien que no está en la casa, poné el server
 > detrás de un túnel o deployalo y seteá `PERTY_PUBLIC_URL`.
 
+## Publicarlo en internet
+
+**En Vercel no funciona.** No es un problema de configuración: Vercel corre
+funciones serverless, que arrancan, responden y mueren. Perty necesita lo
+contrario en tres puntos a la vez:
+
+- **WebSockets abiertos.** Los celulares mantienen la conexión toda la partida.
+- **Estado en memoria.** Las salas viven en un `Map` dentro del proceso. Si cada
+  request cae en una instancia distinta, la sala no existe.
+- **Timers propios.** El juego avanza solo, con `setTimeout` adentro del proceso.
+  Una función que ya devolvió no puede hacer avanzar una ronda.
+
+Lo mismo aplica a Netlify o Cloudflare Workers. Hace falta una plataforma que
+corra **un proceso Node que no se apague**: Render, Railway, Fly.io o un VPS.
+
+### El camino más corto: Render
+
+1. New → Web Service, y conectá este repo.
+2. **Build Command:** `npm install && npm run build`
+3. **Start Command:** `npm start`
+4. **Instances: 1.** Esto no es opcional (ver abajo).
+
+No hace falta configurar nada más: el server toma el `PORT` que le pasa la
+plataforma y el QR se arma solo con el dominio por el que entró la tele.
+
+### Una sola instancia, siempre
+
+Las salas viven en la memoria de un proceso. Con dos instancias, la tele puede
+quedar en una y los celulares en la otra, y no se ven entre sí. Mientras no haya
+un almacenamiento compartido, **no escalar horizontalmente**.
+
+Tampoco sobreviven a un reinicio: si el server se cae o la plataforma lo duerme
+por inactividad, las salas abiertas se pierden. Para juntadas donde se arranca
+de cero cada noche no molesta; hay que saberlo igual.
+
+### Lo que se gana al publicarlo
+
+Además de poder jugar sin estar en la misma casa, se gana **HTTPS**, y con eso
+el bloqueo de pantalla del celular: la Wake Lock API solo existe en contextos
+seguros, así que en la LAN por HTTP hoy no funciona (falla en silencio, el juego
+sigue andando). Publicado, funciona.
+
+### Otras plataformas
+
+Hay un `Dockerfile` en la raíz para Fly.io, Railway o un VPS. Sirve también para
+correrlo en casa siempre prendido, en una Raspberry o un NAS.
+
+> `PERTY_PUBLIC_URL` existe como escape: solo hace falta si el dominio público
+> no es por el que entra la tele (por ejemplo detrás de un proxy raro).
+
+---
+
 ## Probar sin juntar a nadie
 
 Bots que se conectan como jugadores comunes y contestan solos:

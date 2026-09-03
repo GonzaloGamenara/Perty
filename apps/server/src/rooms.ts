@@ -8,17 +8,22 @@ export class RoomStore {
 
   constructor(
     private readonly hooks: RoomHooks,
-    private readonly joinUrlFor: (code: RoomCode) => string,
+    private readonly joinUrlFor: (code: RoomCode, origin: string | null) => string,
   ) {
     setInterval(() => this.sweep(), 15 * 60 * 1000).unref();
   }
 
-  create(): Room {
+  create(origin: string | null = null): Room {
     let code = randomRoomCode();
     while (this.rooms.has(code)) code = randomRoomCode();
-    const room = new Room(code, this.joinUrlFor(code), this.hooks);
+    const room = new Room(code, this.joinUrlFor(code, origin), this.hooks);
     this.rooms.set(code, room);
     return room;
+  }
+
+  /** La tele volvió por otra URL (otro dominio, otra IP): el QR se recalcula. */
+  refreshJoinUrl(room: Room, origin: string | null): void {
+    room.setJoinUrl(this.joinUrlFor(room.code, origin));
   }
 
   get(code: string | undefined | null): Room | null {

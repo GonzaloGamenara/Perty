@@ -9,7 +9,8 @@
     "apps/controller/src/**/*.ts",
     "apps/controller/src/**/*.tsx",
     "apps/host/src/**/*.d.ts",
-    "apps/controller/src/**/*.d.ts"
+    "apps/controller/src/**/*.d.ts",
+    "apps/server/test/**/*.ts"
   ],
   "compilerOptions": {
     "jsx": "react-jsx",
