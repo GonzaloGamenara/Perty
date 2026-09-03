@@ -265,13 +265,21 @@ if (config.isProd) {
 }
 
 http.listen(config.port, () => {
-  const lan = lanAddress();
-  const tv = config.isProd ? `http://${lan}:${config.port}` : 'http://localhost:5173';
-  const phone = config.isProd ? `http://${lan}:${config.port}/j` : `http://${lan}:5174`;
   console.log('');
   console.log('  🎉  Perty listo');
-  console.log(`      tele    ${tv}`);
-  console.log(`      celular ${phone}`);
-  console.log(`      server  http://${lan}:${config.port}`);
+
+  if (config.publicBase) {
+    console.log(`      abrí en la tele  ${config.publicBase}`);
+  } else if (process.env.RENDER || process.env.FLY_APP_NAME || process.env.RAILWAY_ENVIRONMENT) {
+    // Publicado: la IP interna del contenedor no le sirve a nadie.
+    console.log(`      escuchando en el puerto ${config.port}`);
+    console.log('      abrí en la tele la URL pública de tu servicio');
+  } else {
+    const lan = lanAddress();
+    const tv = config.isProd ? `http://${lan}:${config.port}` : 'http://localhost:5173';
+    const phone = config.isProd ? `http://${lan}:${config.port}/j` : `http://${lan}:5174`;
+    console.log(`      tele    ${tv}`);
+    console.log(`      celular ${phone}`);
+  }
   console.log('');
 });
