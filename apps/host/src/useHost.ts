@@ -112,13 +112,34 @@ export function useHost() {
   const action = useCallback((a: HostAction) => socket.emit(EV.hostAction, a), []);
   const backToLobby = useCallback(() => socket.emit(EV.hostReturnToLobby), []);
 
+  const addBot = useCallback(() => {
+    socket.emit(EV.hostAddBot, {}, (ack: { ok: boolean; error?: string }) => {
+      if (!ack?.ok) setError(ack?.error ?? 'No se pudo agregar el bot');
+    });
+  }, []);
+
+  const removeBots = useCallback(() => socket.emit(EV.hostRemoveBots, {}), []);
+
   const closeRoom = useCallback(() => {
     localStorage.removeItem(SESSION_KEY);
     setFrame(null);
     setStatus('idle');
   }, []);
 
-  return { frame, games, status, error, createRoom, startGame, action, backToLobby, closeRoom, clockOffset };
+  return {
+    frame,
+    games,
+    status,
+    error,
+    createRoom,
+    startGame,
+    action,
+    backToLobby,
+    closeRoom,
+    addBot,
+    removeBots,
+    clockOffset,
+  };
 }
 
 /** Cuenta regresiva sincronizada con el server. */

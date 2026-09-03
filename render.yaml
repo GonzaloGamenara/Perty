@@ -1,0 +1,14 @@
+# Deploy con un clic: en Render, New -> Blueprint y apuntá a este repo.
+# Una sola instancia a propósito: las salas viven en memoria de un proceso.
+services:
+  - type: web
+    name: perty
+    runtime: node
+    plan: free
+    numInstances: 1
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 22

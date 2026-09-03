@@ -78,7 +78,10 @@ export class Room {
     return this.records.get(id)?.player ?? null;
   }
 
-  addPlayer(rawName: string): { player: Player; token: string } | { error: string } {
+  addPlayer(
+    rawName: string,
+    options: { isBot?: boolean } = {},
+  ): { player: Player; token: string } | { error: string } {
     if (this.order.length >= MAX_PLAYERS) return { error: 'La sala está llena' };
     const name = normalizeName(rawName);
     if (!name) return { error: 'Poné un nombre' };
@@ -95,6 +98,7 @@ export class Room {
       emoji: AVATARS.find((a) => !used.has(a)) ?? AVATARS[this.order.length % AVATARS.length]!,
       connected: true,
       isVip: this.order.length === 0,
+      ...(options.isBot ? { isBot: true } : {}),
     };
     const token = randomToken();
     this.records.set(id, { player, token, socketId: null, lastSeen: Date.now() });
@@ -158,6 +162,10 @@ export class Room {
 
   isVip(id: PlayerId): boolean {
     return this.records.get(id)?.player.isVip ?? false;
+  }
+
+  get bots(): Player[] {
+    return this.players.filter((player) => player.isBot);
   }
 
   // -- ciclo de juego -------------------------------------------------------

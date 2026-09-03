@@ -8,11 +8,14 @@ interface Props {
   room: RoomSnapshot;
   games: GameInfo[];
   onStart: (gameId: string, settings: SettingValues) => void;
+  onAddBot: () => void;
+  onRemoveBots: () => void;
 }
 
-export default function Lobby({ room, games, onStart }: Props) {
+export default function Lobby({ room, games, onStart, onAddBot, onRemoveBots }: Props) {
   const [qr, setQr] = useState<string>('');
   const [chosen, setChosen] = useState<GameInfo | null>(null);
+  const hasBots = room.players.some((player) => player.isBot);
 
   useEffect(() => {
     void QRCode.toDataURL(room.joinUrl, {
@@ -58,6 +61,24 @@ export default function Lobby({ room, games, onStart }: Props) {
                 </motion.div>
               ))}
             </AnimatePresence>
+          </div>
+
+          {/* Para probar un juego sin esperar a nadie, o completar la mesa. */}
+          <div className="flex w-full gap-2 pt-3">
+            <button
+              onClick={onAddBot}
+              className="flex-1 rounded-xl border border-line bg-panel py-2.5 text-sm font-bold text-white/70 transition hover:border-white/40 hover:text-white"
+            >
+              🤖 Agregar bot
+            </button>
+            {hasBots && (
+              <button
+                onClick={onRemoveBots}
+                className="rounded-xl border border-line bg-panel px-4 py-2.5 text-sm font-bold text-white/40 transition hover:border-white/40 hover:text-white"
+              >
+                Sacar
+              </button>
+            )}
           </div>
         </aside>
 

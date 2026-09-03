@@ -67,13 +67,17 @@ corra **un proceso Node que no se apague**: Render, Railway, Fly.io o un VPS.
 
 ### El camino más corto: Render
 
-1. New → Web Service, y conectá este repo.
-2. **Build Command:** `npm install && npm run build`
-3. **Start Command:** `npm start`
-4. **Instances: 1.** Esto no es opcional (ver abajo).
+Hay un `render.yaml` en la raíz, así que no hay que completar campos:
 
-No hace falta configurar nada más: el server toma el `PORT` que le pasa la
-plataforma y el QR se arma solo con el dominio por el que entró la tele.
+1. Creá tu cuenta en [render.com](https://render.com) (podés entrar con GitHub).
+2. **New → Blueprint** y elegí este repo.
+3. Apply. Tarda unos minutos la primera vez.
+
+Te queda una URL fija tipo `https://perty.onrender.com`. Esa es la que abrís en
+la tele, siempre. El QR se arma solo con ese dominio: no hay nada que configurar.
+
+En el plan gratis el servicio se duerme a los 15 minutos sin uso; el primero que
+abre la URL lo despierta en unos 30 segundos.
 
 ### Una sola instancia, siempre
 
@@ -134,14 +138,19 @@ correrlo en casa siempre prendido, en una Raspberry o un NAS.
 
 ## Probar sin juntar a nadie
 
-Bots que se conectan como jugadores comunes y contestan solos:
+En el lobby hay un botón **🤖 Agregar bot**: cada clic suma un jugador que el
+server maneja solo. Contestan con demoras y aciertos variados, así que sirven
+para ver un juego entero funcionando, o para completar la mesa si falta uno.
+
+También están por línea de comandos, que además prueban la red de verdad porque
+se conectan por socket como un celular:
 
 ```bash
 npm run bots -- ABCD 3
 ```
 
-(`ABCD` es el código que muestra la tele.) Sirven para ver una mecánica nueva
-funcionando sin esperar al fin de semana.
+(`ABCD` es el código que muestra la tele.) Los dos caminos comparten el mismo
+cerebro: `apps/server/src/bot-brain.ts`.
 
 ## Otros comandos
 

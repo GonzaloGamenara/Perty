@@ -17,6 +17,8 @@ export interface Player {
   connected: boolean;
   /** El que abrió la sala manda: elige juego y arranca. */
   isVip: boolean;
+  /** Jugador de relleno que maneja el server. Se ve marcado en la tele. */
+  isBot?: boolean;
 }
 
 export type RoomPhase = 'lobby' | 'game' | 'results';
@@ -250,6 +252,8 @@ export const EV = {
   hostStart: 'host:start',
   hostAction: 'host:action',
   hostReturnToLobby: 'host:lobby',
+  hostAddBot: 'host:addBot',
+  hostRemoveBots: 'host:removeBots',
   // celu -> server
   playerJoin: 'player:join',
   playerResume: 'player:resume',

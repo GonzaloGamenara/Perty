@@ -47,11 +47,21 @@ export function Avatar({
 }) {
   const px = size === 'lg' ? 'size-24 text-5xl' : size === 'sm' ? 'size-10 text-xl' : 'size-16 text-3xl';
   return (
-    <div
-      className={`grid ${px} place-items-center rounded-2xl transition-opacity ${dim ? 'opacity-30' : ''}`}
-      style={{ backgroundColor: `${player.color}26`, boxShadow: `inset 0 0 0 3px ${player.color}` }}
-    >
-      {player.emoji}
+    <div className="relative">
+      <div
+        className={`grid ${px} place-items-center rounded-2xl transition-opacity ${dim ? 'opacity-30' : ''}`}
+        style={{ backgroundColor: `${player.color}26`, boxShadow: `inset 0 0 0 3px ${player.color}` }}
+      >
+        {player.emoji}
+      </div>
+      {player.isBot && (
+        <span
+          title="Bot"
+          className="absolute -right-1 -bottom-1 rounded-full bg-black/70 px-1 text-[11px] leading-tight"
+        >
+          🤖
+        </span>
+      )}
     </div>
   );
 }

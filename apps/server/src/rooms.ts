@@ -32,9 +32,15 @@ export class RoomStore {
   }
 
   close(code: RoomCode): void {
-    this.rooms.get(code)?.dispose();
+    const room = this.rooms.get(code);
+    if (!room) return;
+    this.onClose?.(room);
+    room.dispose();
     this.rooms.delete(code);
   }
+
+  /** Se avisa antes de tirar una sala, para que nadie quede con timers colgados. */
+  onClose: ((room: Room) => void) | null = null;
 
   get size(): number {
     return this.rooms.size;
@@ -44,6 +50,7 @@ export class RoomStore {
     const cutoff = Date.now() - ROOM_TTL_MS;
     for (const [code, room] of this.rooms) {
       if (room.createdAt < cutoff) {
+        this.onClose?.(room);
         room.dispose();
         this.rooms.delete(code);
       }

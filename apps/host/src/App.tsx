@@ -41,7 +41,15 @@ export default function App() {
   const game = host.frame.game as GameView;
 
   if (room.phase === 'lobby' || !game) {
-    return <Lobby room={room} games={host.games} onStart={host.startGame} />;
+    return (
+      <Lobby
+        room={room}
+        games={host.games}
+        onStart={host.startGame}
+        onAddBot={host.addBot}
+        onRemoveBots={host.removeBots}
+      />
+    );
   }
 
   if (game.kind === 'results') {

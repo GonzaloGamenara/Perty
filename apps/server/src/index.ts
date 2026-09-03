@@ -12,6 +12,7 @@ import {
   type PlayerJoinAck,
   type SettingValues,
 } from '@perty/protocol';
+import { BotDriver } from './bot-driver';
 import { joinUrl, lanAddress, originFromHeaders, readNetConfig } from './net';
 import { RoomStore } from './rooms';
 
@@ -33,6 +34,7 @@ const io = new Server(http, {
 // Difusión de frames
 // ---------------------------------------------------------------------------
 
+const bots = new BotDriver();
 const dirty = new Set<Room>();
 let flushScheduled = false;
 
@@ -61,13 +63,20 @@ function pushFrames(room: Room): void {
     });
   }
   for (const player of room.players) {
+    const view = room.playerGameView(player.id);
+
+    if (player.isBot) {
+      bots.handle(room, player.id, view);
+      continue;
+    }
+
     const socketId = room.socketIdOf(player.id);
     if (!socketId) continue;
     io.to(socketId).emit(EV.playerFrame, {
       serverNow,
       room: snapshot,
       me: player,
-      view: room.playerGameView(player.id),
+      view,
       hud: room.playerHud(player.id),
     });
   }
@@ -86,6 +95,8 @@ const store = new RoomStore(
   },
   (code, origin) => joinUrl(config, code, origin),
 );
+
+store.onClose = (room) => bots.forgetRoom(room);
 
 // ---------------------------------------------------------------------------
 // Sockets
@@ -169,6 +180,21 @@ io.on('connection', (socket) => {
   socket.on(EV.hostReturnToLobby, () => {
     const room = roomOf(socket);
     if (room && session(socket).role === 'host') room.returnToLobby();
+  });
+
+  socket.on(EV.hostAddBot, (_payload: unknown, ack: unknown) => {
+    const room = roomOf(socket);
+    if (!room || session(socket).role !== 'host') return reply(ack, fail('No sos el host'));
+    const result = bots.add(room);
+    if ('error' in result) return reply(ack, fail(result.error));
+    reply(ack, { ok: true });
+  });
+
+  socket.on(EV.hostRemoveBots, (_payload: unknown, ack: unknown) => {
+    const room = roomOf(socket);
+    if (!room || session(socket).role !== 'host') return reply(ack, fail('No sos el host'));
+    bots.removeAll(room);
+    reply(ack, { ok: true });
   });
 
   // -- celulares -------------------------------------------------------------
