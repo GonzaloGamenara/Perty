@@ -85,6 +85,36 @@ Tampoco sobreviven a un reinicio: si el server se cae o la plataforma lo duerme
 por inactividad, las salas abiertas se pierden. Para juntadas donde se arranca
 de cero cada noche no molesta; hay que saberlo igual.
 
+### En qué pantalla se muestra
+
+La vista de la tele se dibuja siempre a **1280x720** y se escala para entrar en
+la pantalla que sea. Eso vuelve intercambiables estas tres opciones:
+
+| Cómo | Quién dibuja |
+|---|---|
+| Abrir la URL en el navegador de la smart TV | La tele |
+| Espejar un celular o tablet (AirPlay, Chromecast) | El celular |
+| Notebook por HDMI, o castear la pestaña | La notebook |
+
+Las últimas dos **esquivan el navegador de la tele**, que es la parte más
+impredecible del sistema. Si espejás, ese dispositivo queda ocupado haciendo de
+tele y no puede jugar: usá uno que sobre, o el de quien prefiera mirar.
+
+> El servidor no puede vivir en un iPhone: iOS no deja correr procesos de fondo.
+> Eso va en internet o en una notebook, y es independiente de dónde se muestre.
+
+### Antes de la junta: probá la tele
+
+Abrí **`/check`** en el navegador de la tele (por ejemplo
+`https://tu-app.onrender.com/check`). Es una página en HTML y JS planos, sin
+build, que carga en cualquier navegador y dice en 30 segundos si esa pantalla
+puede correr el juego.
+
+El navegador de una smart TV va clavado al año del modelo y no se actualiza de
+verdad. El piso de Perty es **Chrome 99** (por las capas de CSS), lo que en
+Samsung/Tizen significa modelos de **2023 en adelante**. Si `/check` da que no,
+cualquiera de las otras dos filas de la tabla de arriba lo resuelve.
+
 ### Lo que se gana al publicarlo
 
 Además de poder jugar sin estar en la misma casa, se gana **HTTPS**, y con eso
