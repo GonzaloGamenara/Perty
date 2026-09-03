@@ -1,7 +1,7 @@
 import { createServer } from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import express from 'express';
+import express, { type Request, type Response } from 'express';
 import { Server, type Socket } from 'socket.io';
 import { createRegistry } from '@perty/games';
 import type { Room } from '@perty/engine';
@@ -242,6 +242,14 @@ function startDefaultGame(room: Room): void {
 // ---------------------------------------------------------------------------
 // HTTP
 // ---------------------------------------------------------------------------
+
+/**
+ * Diagnóstico para abrir en la tele antes de la junta: dice si ese navegador
+ * puede correr el juego. Va en HTML plano para que cargue hasta en un Tizen viejo.
+ */
+app.get('/check', (_req: Request, res: Response) => {
+  res.sendFile(path.join(here, '../public/check.html'));
+});
 
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true, rooms: store.size, games: registry.catalog().length });

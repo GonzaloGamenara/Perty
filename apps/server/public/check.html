@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Perty · ¿anda en esta pantalla?</title>
+    <!--
+      Esta página tiene que poder abrirse en un navegador viejo de smart TV,
+      así que va todo a mano: sin bundler, sin Tailwind, CSS de 2015 y JS ES5.
+      Si esta página se ve mal, ya sabés la respuesta.
+    -->
+    <style>
+      body {
+        margin: 0;
+        padding: 40px 32px;
+        background: #0b0b12;
+        color: #f4f4f7;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 22px;
+        line-height: 1.5;
+      }
+      h1 { font-size: 44px; margin: 0 0 4px; }
+      .sub { color: #9a9aa8; margin: 0 0 28px; font-size: 20px; }
+      .verdict {
+        border-radius: 16px;
+        padding: 24px 28px;
+        margin-bottom: 28px;
+        font-size: 30px;
+        font-weight: bold;
+      }
+      .ok { background: #0d3b2a; color: #6ee7b7; }
+      .bad { background: #3f1218; color: #fca5a5; }
+      .row {
+        border-top: 1px solid #26263a;
+        padding: 14px 0;
+        overflow: hidden;
+      }
+      .name { float: left; }
+      .state { float: right; font-weight: bold; }
+      .yes { color: #6ee7b7; }
+      .no { color: #fca5a5; }
+      .why { clear: both; color: #83839a; font-size: 17px; padding-top: 4px; }
+      .foot { margin-top: 28px; color: #83839a; font-size: 18px; }
+      code { color: #c9c9dd; }
+    </style>
+  </head>
+  <body>
+    <h1>Perty</h1>
+    <p class="sub">¿Este navegador puede correr el juego?</p>
+    <div id="verdict" class="verdict">Probando…</div>
+    <div id="rows"></div>
+    <p class="foot" id="ua"></p>
+
+    <script>
+      /* Cada prueba dice si el navegador banca algo que Perty necesita. */
+      function supportsLayer() {
+        try {
+          var style = document.createElement('style');
+          style.textContent = '@layer probe { #layer-probe { color: rgb(1, 2, 3); } }';
+          document.head.appendChild(style);
+          var probe = document.createElement('div');
+          probe.id = 'layer-probe';
+          document.body.appendChild(probe);
+          var color = window.getComputedStyle(probe).color;
+          document.body.removeChild(probe);
+          document.head.removeChild(style);
+          return color.replace(/\s/g, '') === 'rgb(1,2,3)';
+        } catch (e) {
+          return false;
+        }
+      }
+
+      function supportsCss(prop, value) {
+        return !!(window.CSS && CSS.supports && CSS.supports(prop, value));
+      }
+
+      function supportsModernJs() {
+        try {
+          /* El bundle se compila a ES2020: encadenamiento opcional y ?? */
+          new Function('var o = {}; return o?.a ?? 1;')();
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
+
+      var checks = [
+        {
+          name: 'Capas de CSS (@layer)',
+          critical: true,
+          pass: supportsLayer(),
+          why: 'Sin esto la pantalla se ve sin ningún estilo. Llegó en Chrome 99.'
+        },
+        {
+          name: 'JavaScript moderno',
+          critical: true,
+          pass: supportsModernJs(),
+          why: 'Sin esto no arranca nada. Llegó en Chrome 80.'
+        },
+        {
+          name: 'WebSockets',
+          critical: true,
+          pass: 'WebSocket' in window,
+          why: 'Es como la tele habla con los celulares.'
+        },
+        {
+          name: 'Colores con transparencia (color-mix)',
+          critical: false,
+          pass: supportsCss('color', 'color-mix(in oklab, red 50%, transparent)'),
+          why: 'Si falta, Perty usa colores de reserva. Se ve igual.'
+        },
+        {
+          name: 'Propiedades animables (@property)',
+          critical: false,
+          pass: !!(window.CSS && CSS.registerProperty),
+          why: 'Si falta, algunas animaciones quedan más secas. Se juega igual.'
+        },
+        {
+          name: 'Pantalla siempre encendida',
+          critical: false,
+          pass: 'wakeLock' in navigator,
+          why: 'Solo evita que se apague la pantalla del celular. No aplica a la tele.'
+        }
+      ];
+
+      var rows = document.getElementById('rows');
+      var brokenCritical = 0;
+
+      for (var i = 0; i < checks.length; i++) {
+        var check = checks[i];
+        if (check.critical && !check.pass) brokenCritical++;
+
+        var row = document.createElement('div');
+        row.className = 'row';
+        row.innerHTML =
+          '<span class="name">' + check.name + (check.critical ? '' : ' <span style="color:#6b6b80">(opcional)</span>') + '</span>' +
+          '<span class="state ' + (check.pass ? 'yes' : 'no') + '">' + (check.pass ? 'SÍ' : 'NO') + '</span>' +
+          '<div class="why">' + check.why + '</div>';
+        rows.appendChild(row);
+      }
+
+      var verdict = document.getElementById('verdict');
+      if (brokenCritical === 0) {
+        verdict.className = 'verdict ok';
+        verdict.innerHTML = '✅ Perty anda en esta pantalla';
+      } else {
+        verdict.className = 'verdict bad';
+        verdict.innerHTML =
+          '❌ Acá no va a andar' +
+          '<div style="font-size:20px;font-weight:normal;margin-top:10px;color:#f5b5b5">' +
+          'Conectá un Chromecast, un Fire Stick o una notebook por HDMI y abrí la misma URL ahí.' +
+          '</div>';
+      }
+
+      document.getElementById('ua').innerHTML = 'Navegador: <code>' + navigator.userAgent + '</code>';
+    </script>
+  </body>
+</html>
