@@ -3,6 +3,7 @@ import type { ResultsView } from '@perty/protocol';
 import type {
   BossHostView,
   LiarHostView,
+  PollHostView,
   PriceHostView,
   QuipHostView,
   TriviaHostView,
@@ -12,6 +13,7 @@ import BossStage from './BossStage';
 import LiarStage from './LiarStage';
 import Lobby from './Lobby';
 import NightStage from './NightStage';
+import PollStage from './PollStage';
 import PriceStage from './PriceStage';
 import QuipsStage from './QuipsStage';
 import Results from './Results';
@@ -23,6 +25,7 @@ type GameView =
   | TriviaHostView
   | BossHostView
   | LiarHostView
+  | PollHostView
   | PriceHostView
   | QuipHostView
   | NightHostView
@@ -77,6 +80,10 @@ export default function App() {
 
   if (game.kind.startsWith('night/')) {
     return <NightStage view={game as NightHostView} room={room} />;
+  }
+
+  if (game.kind.startsWith('poll/')) {
+    return <PollStage view={game as PollHostView} room={room} clockOffset={host.clockOffset} />;
   }
 
   if (game.kind.startsWith('price/')) {

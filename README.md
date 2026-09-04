@@ -3,7 +3,7 @@
 Central de juegos para jugar en la tele con el celular como control.
 La tele muestra el tablero, cada uno entra desde su celu escaneando un QR.
 
-Cinco juegos, y un modo que los encadena:
+Seis juegos, y un modo que los encadena:
 
 - **Trivia Caótica** — todos contra todos. Monedas, estrellas por categoría que
   se roban entre ustedes, y doce modificadores que rompen las reglas cada par de rondas.
@@ -18,6 +18,9 @@ Cinco juegos, y un modo que los encadena:
 - **Superlativos** — una consigna absurda, todos escriben lo que se les canta y
   después votan la mejor sin saber de quién es. Acá no hay respuesta correcta:
   gana el que hace reír. Algunas consignas son sobre alguien de la mesa.
+- **Encuesta** — una consigna boba y todos escriben lo primero que se les viene.
+  Cobra el que coincidió con la mayoría, no el que tiene razón. El único que
+  queda solo se lleva la vaca 🐄, y terminar con ella cuesta caro.
 - **La Noche** — varios juegos seguidos con un solo campeón. Cada uno reparte
   pasos según el puesto, entre juego y juego cae un evento que castiga al que va
   ganando, y el último vale doble.
@@ -183,7 +186,7 @@ ritmo de una noche.
 packages/
   protocol/   tipos compartidos: el contrato entre server, tele y celular
   engine/     salas, jugadores, timers y el contrato GameModule (no sabe de juegos)
-  games/      trivia + jefe final + mentiroso + el precio justo + superlativos
+  games/      los seis juegos y sus bancos
 apps/
   server/     socket.io, salas en memoria, sirve las dos apps en producción
   host/       la tele (React + Vite)
@@ -213,8 +216,8 @@ Los detalles de cómo sumar juegos, mecánicas y preguntas están en
 ## Sumar preguntas
 
 El banco arranca con **421 preguntas** repartidas en 12 categorías (35 por tema),
-**120 consignas** para Mentiroso, **68 preguntas numéricas** para El Precio Justo
-y **118 consignas** para Superlativos. Una partida de trivia usa 12 preguntas y
+**120 consignas** para Mentiroso, **68 preguntas numéricas** para El Precio Justo,
+**118 consignas** para Superlativos y **108 para Encuesta**. Una partida de trivia usa 12 preguntas y
 una de jefe hasta 15, así que da para varias noches sin repetir.
 
 Para la trivia y el jefe, editá

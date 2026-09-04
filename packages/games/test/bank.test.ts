@@ -5,6 +5,7 @@ import { QUESTIONS } from '../src/trivia/questions';
 import { LIAR_PROMPTS } from '../src/liar/prompts';
 import { normalize } from '../src/liar/index';
 import { QUIP_PROMPTS } from '../src/quips/prompts';
+import { POLL_PROMPTS } from '../src/poll/prompts';
 
 /**
  * Los bancos se editan a mano y crecen solos. Estos tests son el guardarraíl:
@@ -173,6 +174,40 @@ describe('banco de superlativos', () => {
   it('no usa el hueco de Mentiroso, que los bots leen como seña', () => {
     for (const prompt of QUIP_PROMPTS) {
       assert.ok(!prompt.text.includes('____'), `${prompt.id} usa ____, que es de Mentiroso`);
+    }
+  });
+});
+
+describe('banco de encuesta', () => {
+  it('no tiene ids repetidos', () => {
+    const seen = new Set<string>();
+    for (const prompt of POLL_PROMPTS) {
+      assert.ok(!seen.has(prompt.id), `id repetido: ${prompt.id}`);
+      seen.add(prompt.id);
+    }
+  });
+
+  it('no repite consignas', () => {
+    const seen = new Set<string>();
+    for (const prompt of POLL_PROMPTS) {
+      const key = normalize(prompt.text);
+      assert.ok(key.length > 0, `${prompt.id} tiene el enunciado vacío`);
+      assert.ok(!seen.has(key), `consigna repetida: ${prompt.id}`);
+      seen.add(key);
+    }
+  });
+
+  it('tiene consignas de sobra para varias noches', () => {
+    assert.ok(POLL_PROMPTS.length >= 60, `solo hay ${POLL_PROMPTS.length} consignas`);
+  });
+
+  it('no pisa la seña de Mentiroso ni la de Superlativos', () => {
+    for (const prompt of POLL_PROMPTS) {
+      assert.ok(!prompt.text.includes('____'), `${prompt.id} usa ____, que es de Mentiroso`);
+      assert.ok(
+        !prompt.text.includes('{jugador}'),
+        `${prompt.id} usa {jugador}, que es de Superlativos`,
+      );
     }
   });
 });

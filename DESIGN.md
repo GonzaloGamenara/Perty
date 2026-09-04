@@ -100,8 +100,8 @@ modificador y el celular ya sabe pintar las variantes.
 
 ### Preguntas y consignas
 
-Los bancos (`trivia/questions.ts`, `liar/prompts.ts`, `price/questions.ts` y
-`quips/prompts.ts`) se editan a mano, así
+Los bancos (`trivia/questions.ts`, `liar/prompts.ts`, `price/questions.ts`,
+`quips/prompts.ts` y `poll/prompts.ts`) se editan a mano, así
 que hay un test que los cuida: `test/bank.test.ts` revisa ids repetidos, opciones
 duplicadas dentro de una pregunta, enunciados repetidos, categorías inexistentes,
 mínimo de preguntas por categoría y reparto de dificultades. En Mentiroso además
@@ -310,7 +310,36 @@ de Mentiroso llevan `____`**. Hay un test del banco que lo defiende.
 
 ---
 
-## 8. La Noche · reglas actuales
+## 8. Encuesta · reglas actuales
+
+Herd Mentality. Una consigna con respuesta obvia pero no única, todos escriben, y
+**cobra el grupo mayoritario**. Es la trivia dada vuelta: no importa saber, sino
+adivinar qué van a poner los demás.
+
+- Cada integrante de la mayoría cobra **500 por cabeza del grupo**: con tres que
+  coinciden son 1500 cada uno, así que el rebaño grande paga mucho mejor.
+- La mayoría tiene que ser **una sola y de más de uno**. Si empatan dos grupos o
+  nadie coincide con nadie, la ronda no paga. Eso es lo que la hace tensa: poner
+  lo raro no solo no te da puntos, además puede dejar a todos en cero.
+- **Unanimidad** (+1000 a cada uno) es la mesa entera, no "todos los que
+  llegaron a contestar". Con alguien en blanco la tele estaría cantando un
+  acuerdo que no existió — un test lo defiende.
+- Las respuestas se agrupan con el mismo `normalize()` de Mentiroso, así que
+  "León", "leon" y "LEÓN" son un solo rebaño.
+
+**La vaca 🐄.** Se la lleva **el único** que quedó solo con su respuesta. Si
+quedaron dos solos no se mueve: no hay un raro, hay dos. Se cobra **recién al
+final** (−2500), así que durante la partida es una amenaza y no un castigo, y el
+que la tiene juega distinto la última ronda. Se puede apagar desde el lobby.
+
+**Medallas:** La Vaca, Uno Más del Rebaño, Bicho Raro, Telépata, Fantasma.
+
+En la tele cada respuesta es una barra tan ancha como gente la escribió: el
+rebaño se ve de una, y la vaca viaja de avatar a avatar con un `layoutId`.
+
+---
+
+## 9. La Noche · reglas actuales
 
 No es un juego: es una secuencia de juegos, y por eso **no implementa
 `GameModule`**. La orquesta la sala, que es la única que puede arrancar y
@@ -338,7 +367,7 @@ completas seguidas eran interminables. El jefe además escala su vida con
 
 ---
 
-## 9. Hoja de ruta
+## 10. Hoja de ruta
 
 ### Mecánicas para sumar (ordenadas por relación diversión/esfuerzo)
 
@@ -378,7 +407,7 @@ completas seguidas eran interminables. El jefe además escala su vida con
 
 ---
 
-## 10. Cosas que ya están resueltas y conviene no romper
+## 11. Cosas que ya están resueltas y conviene no romper
 
 - **Reconexión.** El celular guarda su sesión: si se bloquea la pantalla o se
   recarga la página, vuelve a la partida con sus monedas. La tele también se

@@ -1,6 +1,7 @@
 import { GameRegistry } from '@perty/engine';
 import { bossGame } from './boss';
 import { liarGame } from './liar';
+import { pollGame } from './poll';
 import { priceGame } from './price';
 import { quipsGame } from './quips';
 import { triviaGame } from './trivia';
@@ -12,7 +13,8 @@ export function createRegistry(): GameRegistry {
     .register(bossGame)
     .register(liarGame)
     .register(priceGame)
-    .register(quipsGame);
+    .register(quipsGame)
+    .register(pollGame);
 }
 
 export { triviaGame, TRIVIA_INFO, defaultTriviaConfig } from './trivia';
@@ -29,4 +31,6 @@ export { priceGame, PRICE_INFO, defaultPriceConfig, PRICE_QUESTIONS, parseGuess,
 export type * from './price/types';
 export { quipsGame, QUIPS_INFO, defaultQuipConfig, QUIP_PROMPTS, resolvePrompt } from './quips';
 export type * from './quips/types';
+export { pollGame, POLL_INFO, defaultPollConfig, POLL_PROMPTS } from './poll';
+export type * from './poll/types';
 export { NIGHT_ID, nightInfo, buildNightConfig } from './night';

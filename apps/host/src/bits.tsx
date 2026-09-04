@@ -66,6 +66,55 @@ export function Avatar({
   );
 }
 
+/**
+ * Mientras escriben no hay nada que mirar, así que la espera es el show: una
+ * carta por cabeza que se prende cuando esa persona manda lo suyo. La usan los
+ * juegos de escribir (Superlativos, Encuesta).
+ */
+export function WaitingCard({
+  player,
+  ready,
+  tight,
+}: {
+  player: Player;
+  ready: boolean;
+  /** Con mucha gente las cartas se acomodan en dos filas y tienen que achicarse. */
+  tight: boolean;
+}) {
+  return (
+    <motion.div
+      animate={ready ? { scale: 1, y: -10 } : { scale: 0.94, y: 0 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 18 }}
+      className={`flex flex-col items-center gap-3 rounded-3xl border-4 px-4 ${tight ? 'w-40 py-3' : 'w-48 py-6'}`}
+      style={{
+        borderColor: ready ? player.color : 'rgba(255,255,255,0.10)',
+        backgroundColor: ready ? `${player.color}22` : 'rgba(255,255,255,0.03)',
+      }}
+    >
+      <Avatar player={player} size={tight ? 'sm' : 'md'} dim={!ready} />
+      <span className={`text-xl font-black ${ready ? 'text-white' : 'text-white/30'}`}>
+        {player.name}
+      </span>
+      <div className={`flex items-center ${tight ? 'h-8' : 'h-10'}`}>
+        {ready ? (
+          <motion.span
+            initial={{ opacity: 0, scale: 0.4 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: 'spring', stiffness: 420, damping: 14 }}
+            className="text-3xl"
+          >
+            ✍️
+          </motion.span>
+        ) : (
+          <span className="text-sm font-bold tracking-[0.2em] text-white/25 uppercase">
+            pensando
+          </span>
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
 export function TimerRing({ ms, total }: { ms: number; total: number }) {
   const ratio = Math.max(0, Math.min(1, ms / total));
   const radius = 54;

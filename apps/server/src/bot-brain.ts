@@ -1,4 +1,4 @@
-import { PRICE_QUESTIONS, QUESTIONS } from '@perty/games';
+import { POLL_PROMPTS, PRICE_QUESTIONS, QUESTIONS } from '@perty/games';
 import type { Choice, PlayerAction, PlayerView } from '@perty/protocol';
 
 /**
@@ -77,6 +77,12 @@ const QUIPS = [
   'un audio de siete minutos',
 ];
 
+/**
+ * Para Encuesta. La gracia del juego es coincidir, así que el pozo es chico a
+ * propósito: con tres bots tirando de cuatro palabras, se arman rebaños solos.
+ */
+const HERD = ['perro', 'rojo', 'pizza', 'uno'];
+
 export type BotPlan =
   | { kind: 'once'; delayMs: number; action: PlayerAction }
   | { kind: 'mash'; intervalMs: number; durationMs: number };
@@ -141,12 +147,15 @@ export function decide(view: PlayerView, brain: Brain): BotPlan | null {
   }
 
   if (view.kind === 'text') {
-    // Las consignas de Mentiroso son las únicas que traen hueco: sirve de seña.
+    // Mentiroso se reconoce por el hueco; Encuesta, mirando su banco. Lo que
+    // queda es Superlativos, que no tiene respuesta que valga la pena adivinar.
     const text = view.numeric
       ? priceGuessFor(view.prompt, brain.accuracy)
       : view.prompt.includes('____')
         ? pick(LIES)
-        : pick(QUIPS);
+        : POLL_PROMPTS.some((p) => p.text === view.prompt)
+          ? pick(HERD)
+          : pick(QUIPS);
     return { kind: 'once', delayMs: Math.min(wait, 6000), action: { t: 'submitText', text } };
   }
 
