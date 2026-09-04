@@ -145,25 +145,32 @@ function Body({
     case 'liar/reveal':
       return (
         <div className="flex min-h-0 flex-1 flex-col gap-4">
-          <Prompt text={view.text.replace('____', view.answer)} size="small" />
+          {/* Con el hueco todavía: la verdad se revela abajo, al final. */}
+          <Prompt text={view.text} size="small" />
           <div className="flex min-h-0 flex-1 flex-col gap-3">
             {[...view.options]
-              .sort((a, b) => Number(b.truth) - Number(a.truth))
+              // La verdad va última: es el momento que todos esperan.
+              .sort((a, b) => Number(a.truth) - Number(b.truth))
               .map((option, index) => (
                 <OptionRow
                   key={option.id}
                   option={option}
                   voters={view.votesByOption[option.id] ?? []}
                   players={players}
-                  delay={index * 0.12}
+                  delay={index * 0.9}
                 />
               ))}
           </div>
           {view.accidents.length > 0 && (
-            <p className="text-xl text-white/45">
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: view.options.length * 0.9 + 0.8 }}
+              className="text-xl text-white/45"
+            >
               🍀 {view.accidents.map((id) => players.get(id)?.name ?? '?').join(' y ')} habían
               escrito la verdad.
-            </p>
+            </motion.p>
           )}
         </div>
       );
@@ -225,11 +232,18 @@ function OptionRow({
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: -24 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay }}
+      initial={option.truth ? { opacity: 0, scale: 0.85 } : { opacity: 0, x: -24 }}
+      animate={option.truth ? { opacity: 1, scale: 1 } : { opacity: 1, x: 0 }}
+      transition={
+        option.truth
+          ? { delay, type: 'spring', stiffness: 260, damping: 14 }
+          : { delay, duration: 0.35 }
+      }
       className={`flex items-center gap-4 rounded-2xl px-5 py-3 ${option.truth ? 'ring-4 ring-emerald-400' : ''}`}
-      style={{ backgroundColor: option.truth ? '#059669' : `${slot.color}bb` }}
+      style={{
+        backgroundColor: option.truth ? '#059669' : `${slot.color}bb`,
+        boxShadow: option.truth ? '0 0 60px rgba(16,185,129,0.55)' : undefined,
+      }}
     >
       <span className="text-3xl">{option.truth ? '✅' : slot.shape}</span>
       <span className="text-3xl font-black text-white drop-shadow">{option.text}</span>
@@ -245,12 +259,19 @@ function OptionRow({
       )}
 
       <div className="ml-auto flex items-center gap-2">
-        {voters.map((id) => {
+        {voters.map((id, index) => {
           const player = players.get(id);
           return player ? (
-            <span key={id} className="text-3xl" title={player.name}>
+            <motion.span
+              key={id}
+              initial={{ opacity: 0, scale: 0.4 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: delay + 0.35 + index * 0.12, type: 'spring', stiffness: 400 }}
+              className="text-3xl"
+              title={player.name}
+            >
               {player.emoji}
-            </span>
+            </motion.span>
           ) : null;
         })}
       </div>

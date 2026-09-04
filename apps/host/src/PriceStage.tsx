@@ -150,6 +150,11 @@ function Reveal({
   const guessed = outcomes.filter((o) => o.guess !== null);
   const missing = outcomes.filter((o) => o.guess === null);
 
+  // Primero entran las corazonadas de todos; la respuesta cae después. Al revés
+  // no hay tensión: se ve el número real y las apuestas dejan de importar.
+  const GUESS_STEP = 0.35;
+  const answerDelay = 0.4 + guessed.length * GUESS_STEP + 0.5;
+
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-6">
       <div className="flex items-baseline gap-6">
@@ -157,23 +162,40 @@ function Reveal({
         <motion.div
           initial={{ scale: 0.4, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 280, damping: 16 }}
+          transition={{ delay: answerDelay, type: 'spring', stiffness: 280, damping: 14 }}
           className="text-right"
         >
-          <div className="text-7xl font-black text-emerald-400 tabular-nums">{format(answer)}</div>
+          <div
+            className="text-8xl font-black text-emerald-400 tabular-nums"
+            style={{ textShadow: '0 0 40px rgba(52,211,153,0.5)' }}
+          >
+            {format(answer)}
+          </div>
           <div className="text-sm font-bold tracking-widest text-white/30 uppercase">
             {view.unit ?? 'la respuesta'}
           </div>
         </motion.div>
       </div>
 
-      <NumberLine scale={scale} answer={answer} outcomes={guessed} players={players} />
+      <NumberLine
+        scale={scale}
+        answer={answer}
+        outcomes={guessed}
+        players={players}
+        answerDelay={answerDelay}
+        guessStep={GUESS_STEP}
+      />
 
       <div className="flex flex-wrap justify-center gap-3">
-        {outcomes.map((outcome) => {
+        {outcomes.map((outcome, index) => {
           const player = players.get(outcome.playerId);
           return player ? (
-            <OutcomeChip key={outcome.playerId} outcome={outcome} player={player} />
+            <OutcomeChip
+              key={outcome.playerId}
+              outcome={outcome}
+              player={player}
+              delay={answerDelay + 0.7 + index * 0.12}
+            />
           ) : null;
         })}
       </div>
@@ -195,11 +217,15 @@ function NumberLine({
   answer,
   outcomes,
   players,
+  answerDelay,
+  guessStep,
 }: {
   scale: PriceScale;
   answer: number;
   outcomes: PriceOutcome[];
   players: Map<string, Player>;
+  answerDelay: number;
+  guessStep: number;
 }) {
   const span = Math.max(1e-9, scale.max - scale.min);
   const at = (value: number) =>
@@ -225,7 +251,7 @@ function NumberLine({
       <motion.div
         initial={{ opacity: 0, scaleY: 0 }}
         animate={{ opacity: 1, scaleY: 1 }}
-        transition={{ delay: 0.35, type: 'spring', stiffness: 200, damping: 18 }}
+        transition={{ delay: answerDelay, type: 'spring', stiffness: 220, damping: 16 }}
         className="absolute top-1/2 z-10 -translate-x-1/2 -translate-y-1/2"
         style={{ left: at(answer) }}
       >
@@ -241,7 +267,7 @@ function NumberLine({
             key={outcome.playerId}
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 + index * 0.12 }}
+            transition={{ delay: 0.4 + index * guessStep, type: 'spring', stiffness: 320, damping: 22 }}
             className="absolute z-20 flex -translate-x-1/2 flex-col items-center"
             style={{ left: at(outcome.guess), top: `calc(50% - ${64 + lift}px)` }}
           >
@@ -262,7 +288,15 @@ function NumberLine({
   );
 }
 
-function OutcomeChip({ outcome, player }: { outcome: PriceOutcome; player: Player }) {
+function OutcomeChip({
+  outcome,
+  player,
+  delay,
+}: {
+  outcome: PriceOutcome;
+  player: Player;
+  delay: number;
+}) {
   const tone = outcome.exact
     ? 'border-cyan-300/60 bg-cyan-300/15'
     : outcome.over
@@ -275,7 +309,7 @@ function OutcomeChip({ outcome, player }: { outcome: PriceOutcome; player: Playe
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.9 }}
+      transition={{ delay, type: 'spring', stiffness: 340, damping: 22 }}
       className={`flex items-center gap-3 rounded-2xl border px-4 py-2.5 ${tone}`}
     >
       <Avatar player={player} size="sm" />

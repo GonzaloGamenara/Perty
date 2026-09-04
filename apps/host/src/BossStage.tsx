@@ -37,12 +37,20 @@ function BossBar({ hud }: { hud: BossHud }) {
 
   return (
     <header className="relative z-10 flex items-center gap-6 px-8 pt-6 pb-4">
+      {/* La sacudida se rearma con cada cambio de vida: acusa el golpe. */}
       <motion.div
-        animate={cornered ? { scale: [1, 1.06, 1] } : { scale: 1 }}
-        transition={{ repeat: cornered ? Infinity : 0, duration: 1.1 }}
-        className="text-7xl leading-none"
+        key={hud.hp}
+        animate={{ x: [0, -10, 9, -6, 4, 0] }}
+        transition={{ duration: 0.45 }}
+        className="shrink-0"
       >
-        {hud.emoji}
+        <motion.div
+          animate={cornered ? { scale: [1, 1.08, 1] } : { scale: 1 }}
+          transition={{ repeat: cornered ? Infinity : 0, duration: 1.1 }}
+          className="text-7xl leading-none"
+        >
+          {hud.emoji}
+        </motion.div>
       </motion.div>
 
       <div className="min-w-0 flex-1">
@@ -56,12 +64,19 @@ function BossBar({ hud }: { hud: BossHud }) {
           </span>
         </div>
 
-        <div className="mt-2 h-6 overflow-hidden rounded-full bg-white/8">
+        {/* Dos barras: la roja se queda atrás un instante y muestra el mordisco. */}
+        <div className="relative mt-2 h-6 overflow-hidden rounded-full bg-white/8">
           <motion.div
-            className={`h-full rounded-full ${cornered ? 'bg-red-500' : 'bg-emerald-500'}`}
+            className="absolute inset-y-0 left-0 rounded-full bg-red-400/70"
             initial={{ width: '100%' }}
             animate={{ width: `${hpRatio * 100}%` }}
-            transition={{ type: 'spring', stiffness: 120, damping: 20 }}
+            transition={{ delay: 0.55, duration: 0.7, ease: 'easeOut' }}
+          />
+          <motion.div
+            className={`absolute inset-y-0 left-0 rounded-full ${cornered ? 'bg-red-500' : 'bg-emerald-500'}`}
+            initial={{ width: '100%' }}
+            animate={{ width: `${hpRatio * 100}%` }}
+            transition={{ type: 'spring', stiffness: 200, damping: 22 }}
           />
         </div>
 
@@ -81,13 +96,21 @@ function BossBar({ hud }: { hud: BossHud }) {
       </div>
 
       <div className="flex flex-col items-end gap-1">
-        <div className="flex gap-1 text-3xl">
-          {Array.from({ length: hud.maxHearts }, (_, index) => (
-            <span key={index} className={index < hud.hearts ? '' : 'opacity-15 grayscale'}>
-              ❤️
-            </span>
-          ))}
-        </div>
+        <motion.div key={hud.hearts} className="flex gap-1 text-3xl">
+          {Array.from({ length: hud.maxHearts }, (_, index) => {
+            const alive = index < hud.hearts;
+            return (
+              <motion.span
+                key={index}
+                animate={alive ? { scale: 1 } : { scale: [1.6, 0.9, 1], rotate: [0, -20, 0] }}
+                transition={{ duration: 0.5 }}
+                className={alive ? '' : 'opacity-15 grayscale'}
+              >
+                ❤️
+              </motion.span>
+            );
+          })}
+        </motion.div>
         <span className="text-xs font-bold tracking-widest text-white/30 uppercase">
           ronda {hud.round}/{hud.maxRounds}
         </span>
@@ -180,14 +203,21 @@ function Body({
               transition={{ type: 'spring', stiffness: 300, damping: 15 }}
               className="text-right"
             >
-              <div className="text-6xl font-black text-red-400 tabular-nums">
+              <div className="text-7xl font-black text-red-400 tabular-nums">
                 -{view.roundDamage.toLocaleString('es-AR')}
               </div>
               <div className="text-sm font-bold tracking-widest text-white/30 uppercase">daño</div>
             </motion.div>
           </div>
           <ChoiceGrid choices={view.choices} correctId={view.correctChoiceId} />
-          <p className="text-2xl text-white/45 italic">«{view.taunt}»</p>
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.6 }}
+            className="text-2xl text-white/45 italic"
+          >
+            «{view.taunt}»
+          </motion.p>
         </div>
       );
 
@@ -401,10 +431,18 @@ function ChoiceGrid({ choices, correctId }: { choices: Choice[]; correctId?: str
         return (
           <motion.div
             key={choice.id}
-            animate={{ scale: isCorrect ? 1.02 : 1, opacity: dimmed ? 0.2 : 1 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 22 }}
+            animate={{ scale: isCorrect ? 1.04 : 1, opacity: dimmed ? 0.12 : 1 }}
+            transition={{
+              delay: isCorrect ? 0.2 : 0,
+              type: 'spring',
+              stiffness: 280,
+              damping: 16,
+            }}
             className={`flex items-center gap-5 rounded-3xl px-7 py-4 ${isCorrect ? 'ring-6 ring-white' : ''}`}
-            style={{ backgroundColor: slot.color }}
+            style={{
+              backgroundColor: slot.color,
+              boxShadow: isCorrect ? '0 0 70px rgba(255,255,255,0.4)' : undefined,
+            }}
           >
             <span className="text-4xl">{slot.shape}</span>
             <span className="text-3xl leading-tight font-black text-white drop-shadow">
