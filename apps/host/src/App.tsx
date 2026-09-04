@@ -34,33 +34,25 @@ export default function App() {
   }, [action]);
 
   if (!host.frame) {
-    return <Splash status={host.status} error={host.error} onCreate={host.createRoom} />;
+    return (
+      <Splash
+        status={host.status}
+        stalled={host.stalled}
+        error={host.error}
+        onCreate={host.createRoom}
+      />
+    );
   }
 
   const { room } = host.frame;
   const game = host.frame.game as GameView;
 
   if (room.phase === 'lobby' || !game) {
-    return (
-      <Lobby
-        room={room}
-        games={host.games}
-        onStart={host.startGame}
-        onAddBot={host.addBot}
-        onRemoveBots={host.removeBots}
-      />
-    );
+    return <Lobby room={room} />;
   }
 
   if (game.kind === 'results') {
-    return (
-      <Results
-        view={game}
-        room={room}
-        onReplay={() => host.startGame(game.gameId)}
-        onLobby={host.backToLobby}
-      />
-    );
+    return <Results view={game} room={room} />;
   }
 
   if (game.kind.startsWith('boss/')) {
@@ -80,10 +72,12 @@ export default function App() {
 
 function Splash({
   status,
+  stalled,
   error,
   onCreate,
 }: {
   status: string;
+  stalled: boolean;
   error: string | null;
   onCreate: () => void;
 }) {
@@ -104,6 +98,15 @@ function Splash({
         >
           {status === 'connecting' ? 'Conectando…' : 'Crear sala'}
         </button>
+        {stalled && (
+          <div className="max-w-2xl rounded-2xl border border-amber-500/40 bg-amber-500/10 px-6 py-4 text-center">
+            <p className="text-xl font-black text-amber-300">No llego al servidor</p>
+            <p className="mt-1 text-base text-amber-100/70">
+              Si estás en desarrollo, fijate que el server esté levantado. Si es la versión
+              publicada, puede estar despertándose: esperá unos segundos y recargá.
+            </p>
+          </div>
+        )}
         {error && <p className="text-lg font-semibold text-red-400">{error}</p>}
       </div>
     </Stage>

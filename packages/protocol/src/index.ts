@@ -31,6 +31,16 @@ export interface RoomSnapshot {
   gameName: string | null;
   /** URL que el celular abre para unirse (se muestra como QR en la tele). */
   joinUrl: string;
+  /** Lo que el VIP está armando desde su celular, para mostrarlo en la tele. */
+  setup: RoomSetup | null;
+}
+
+export interface RoomSetup {
+  gameId: GameId;
+  gameName: string;
+  emoji: string;
+  /** Resumen legible de las perillas: "12 rondas", "caos normal". */
+  summary: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -44,7 +54,19 @@ export interface RoomSnapshot {
  */
 export type PlayerView =
   | { kind: 'idle'; title: string; subtitle?: string; emoji?: string }
-  | { kind: 'lobby'; canStart: boolean }
+  | {
+      kind: 'lobby';
+      /** El que manda arma la partida desde su celular; el resto solo mira. */
+      isVip: boolean;
+      vipName: string;
+      playerCount: number;
+      /** Catálogo completo, solo para quien elige. */
+      games: GameInfo[];
+      selectedGameId: GameId | null;
+      settings: SettingValues;
+      /** Por qué todavía no se puede arrancar. */
+      blocked?: string;
+    }
   | {
       kind: 'choices';
       prompt?: string;
@@ -111,7 +133,12 @@ export type PlayerAction =
   | { t: 'buzz' }
   | { t: 'tap' }
   | { t: 'submitText'; text: string }
-  | { t: 'ready'; value: boolean };
+  // Acciones del lobby: solo las puede usar quien manda en la sala.
+  | { t: 'selectGame'; gameId: GameId }
+  | { t: 'setSetting'; id: string; value: string | number | string[] }
+  | { t: 'startGame' }
+  | { t: 'addBot' }
+  | { t: 'removeBots' };
 
 export type HostAction =
   | { t: 'advance' }

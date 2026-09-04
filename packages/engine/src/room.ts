@@ -10,6 +10,8 @@ import {
   type PlayerView,
   type RoomCode,
   type RoomPhase,
+  type GameInfo,
+  type RoomSetup,
   type RoomSnapshot,
   type SettingValues,
   type Standing,
@@ -57,6 +59,14 @@ export class Room {
   private currentModule: GameModule | null = null;
   private result: RoomResult | null = null;
   private seq = 0;
+
+  /** Catálogo de juegos, para que el celular del VIP pueda elegir. */
+  private catalog: GameInfo[] = [];
+  /** Lo que el VIP está armando en el lobby. Lo ven todos. */
+  private selection: { gameId: string | null; settings: SettingValues } = {
+    gameId: null,
+    settings: {},
+  };
 
   constructor(
     readonly code: RoomCode,
@@ -164,6 +174,48 @@ export class Room {
     return this.records.get(id)?.player.isVip ?? false;
   }
 
+  // -- armado de la partida (lo maneja el celular del VIP) -------------------
+
+  setCatalog(games: GameInfo[]): void {
+    this.catalog = games;
+    if (!this.selection.gameId) this.selectGame(games[0]?.id ?? null);
+  }
+
+  get chosen(): { gameId: string | null; settings: SettingValues } {
+    return this.selection;
+  }
+
+  selectGame(gameId: string | null): void {
+    const game = this.catalog.find((candidate) => candidate.id === gameId) ?? null;
+    // Al cambiar de juego arrancan sus valores por defecto, no los del anterior.
+    this.selection = {
+      gameId: game?.id ?? null,
+      settings: Object.fromEntries((game?.settings ?? []).map((spec) => [spec.id, spec.default])),
+    };
+    this.touch();
+  }
+
+  setSetting(id: string, value: SettingValues[string]): void {
+    const game = this.catalog.find((candidate) => candidate.id === this.selection.gameId);
+    // Solo se aceptan perillas que ese juego declaró: nada inventado.
+    if (!game?.settings?.some((spec) => spec.id === id)) return;
+    this.selection = {
+      ...this.selection,
+      settings: { ...this.selection.settings, [id]: value },
+    };
+    this.touch();
+  }
+
+  /** Qué falta para poder arrancar, o null si ya se puede. */
+  blockedReason(): string | null {
+    const game = this.catalog.find((candidate) => candidate.id === this.selection.gameId);
+    if (!game) return 'Elegí un juego';
+    if (this.playerCount < game.minPlayers) {
+      return `${game.name} necesita ${game.minPlayers} jugadores`;
+    }
+    return null;
+  }
+
   get bots(): Player[] {
     return this.players.filter((player) => player.isBot);
   }
@@ -238,7 +290,31 @@ export class Room {
       gameId: this.currentModule?.info.id ?? null,
       gameName: this.currentModule?.info.name ?? null,
       joinUrl: this.joinUrl,
+      setup: this.phase === 'game' ? null : this.setupSummary(),
     };
+  }
+
+  /** Traduce la selección a algo legible desde el sillón. */
+  private setupSummary(): RoomSetup | null {
+    const game = this.catalog.find((candidate) => candidate.id === this.selection.gameId);
+    if (!game) return null;
+
+    const summary: string[] = [];
+    for (const spec of game.settings ?? []) {
+      const value = this.selection.settings[spec.id];
+      if (spec.kind === 'choice') {
+        const option = spec.options.find((entry) => String(entry.value) === String(value));
+        if (option) summary.push(option.label);
+      } else {
+        const chosen = Array.isArray(value) ? value : spec.default;
+        summary.push(
+          chosen.length === spec.options.length
+            ? `todas las ${spec.label.toLowerCase()}`
+            : `${chosen.length} de ${spec.options.length} ${spec.label.toLowerCase()}`,
+        );
+      }
+    }
+    return { gameId: game.id, gameName: game.name, emoji: game.emoji, summary };
   }
 
   hostGameView(): unknown {
@@ -249,8 +325,21 @@ export class Room {
   }
 
   playerGameView(id: PlayerId): PlayerView {
-    if (this.phase === 'lobby') {
-      return { kind: 'lobby', canStart: this.isVip(id) };
+    // En resultados el VIP ya arma la próxima partida: la tele solo muestra el
+    // podio y no hace falta tocarla para seguir jugando.
+    if (this.phase === 'lobby' || (this.phase === 'results' && this.isVip(id))) {
+      const isVip = this.isVip(id);
+      return {
+        kind: 'lobby',
+        isVip,
+        vipName: this.players.find((player) => player.isVip)?.name ?? '—',
+        playerCount: this.playerCount,
+        // El catálogo pesa: solo lo recibe quien tiene que elegir.
+        games: isVip ? this.catalog : [],
+        selectedGameId: this.selection.gameId,
+        settings: this.selection.settings,
+        ...(this.blockedReason() ? { blocked: this.blockedReason()! } : {}),
+      };
     }
     if (this.phase === 'results' && this.result) {
       const standing = this.result.standings.find((s) => s.playerId === id);

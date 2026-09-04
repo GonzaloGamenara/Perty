@@ -184,6 +184,12 @@ apps/
   controller/ el celular (React + Vite)
 ```
 
+**La tele no se toca.** A una smart TV no se le puede hacer clic, así que el
+lobby vive en el celular del que abre la sala: ahí se elige el juego, se ajustan
+las perillas, se agregan bots y se arranca. La tele muestra el QR, quién está y
+qué se está armando. Lo único que se aprieta en la tele es el botón de crear la
+sala, que además es el gesto que habilita el sonido.
+
 Tres decisiones que conviene conocer antes de tocar algo:
 
 1. **El server es autoritativo.** El celular manda intención (`elegí la opción B`)

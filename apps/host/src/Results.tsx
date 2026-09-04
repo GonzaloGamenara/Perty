@@ -5,14 +5,12 @@ import { Avatar, Rolling, Stage, playerMap } from './bits';
 interface Props {
   view: ResultsView;
   room: RoomSnapshot;
-  onReplay: () => void;
-  onLobby: () => void;
 }
 
 const PODIUM_HEIGHT = ['h-64', 'h-48', 'h-36'];
 const PODIUM_MEDAL = ['🥇', '🥈', '🥉'];
 
-export default function Results({ view, room, onReplay, onLobby }: Props) {
+export default function Results({ view, room }: Props) {
   const players = playerMap(room.players);
   const top = view.standings.slice(0, 3);
   const rest = view.standings.slice(3);
@@ -104,20 +102,9 @@ export default function Results({ view, room, onReplay, onLobby }: Props) {
           </div>
         </section>
 
-        <div className="flex justify-center gap-4">
-          <button
-            onClick={onReplay}
-            className="rounded-2xl bg-white px-10 py-4 text-xl font-black text-black transition hover:scale-[1.02]"
-          >
-            Otra vez
-          </button>
-          <button
-            onClick={onLobby}
-            className="rounded-2xl border border-line bg-panel px-10 py-4 text-xl font-bold transition hover:border-white/40"
-          >
-            Volver al lobby
-          </button>
-        </div>
+        <p className="text-center text-xl text-white/35">
+          {champion ? 'Armá la próxima desde el celular.' : 'Seguí desde el celular.'}
+        </p>
       </div>
     </Stage>
   );

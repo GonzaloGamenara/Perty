@@ -5,6 +5,7 @@ import {
   type PlayerFrame,
   type PlayerView,
 } from '@perty/protocol';
+import LobbyScreen from './LobbyScreen';
 import { buzz, useCountdown } from './usePerty';
 
 interface Props {
@@ -66,7 +67,7 @@ function ViewBody({
 }) {
   switch (view.kind) {
     case 'lobby':
-      return <Lobby canStart={view.canStart} act={act} leave={leave} />;
+      return <LobbyScreen view={view} act={act} leave={leave} />;
 
     case 'idle':
       return (
@@ -120,38 +121,6 @@ function Centered({
       {emoji && <div className="animate-pop text-7xl">{emoji}</div>}
       <h2 className="text-3xl leading-tight font-black text-balance">{title}</h2>
       {subtitle && <p className="text-base text-balance text-white/55">{subtitle}</p>}
-    </div>
-  );
-}
-
-function Lobby({
-  canStart,
-  act,
-  leave,
-}: {
-  canStart: boolean;
-  act: (action: PlayerAction) => void;
-  leave: () => void;
-}) {
-  return (
-    <div className="flex h-full flex-col">
-      <Centered emoji="🛋️" title="Estás adentro" subtitle="Mirá la tele" />
-      <div className="mt-auto flex flex-col gap-3">
-        {canStart && (
-          <button
-            onClick={() => {
-              buzz(20);
-              act({ t: 'ready', value: true });
-            }}
-            className="rounded-2xl bg-emerald-400 py-5 text-xl font-black text-black transition active:scale-[0.98]"
-          >
-            Empezar la partida
-          </button>
-        )}
-        <button onClick={leave} className="py-2 text-sm text-white/35">
-          Salir de la sala
-        </button>
-      </div>
     </div>
   );
 }

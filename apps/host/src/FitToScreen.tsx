@@ -1,8 +1,10 @@
 import { useEffect, useState, type ReactNode } from 'react';
 
-/** Resolución de diseño de la tele. Todo el host se dibuja a esta medida. */
+/** Ancho de diseño. La altura se estira para llenar la pantalla que toque. */
 const DESIGN_WIDTH = 1280;
-const DESIGN_HEIGHT = 720;
+/** Límites de altura, para que una pantalla rarísima no deforme el diseño. */
+const MIN_HEIGHT = 560;
+const MAX_HEIGHT = 1000;
 
 /**
  * Dibuja la tele siempre a 1280x720 y la escala para que entre en la pantalla
@@ -14,7 +16,7 @@ const DESIGN_HEIGHT = 720;
  * ajuste de tamaños; con esto, todas muestran exactamente el mismo diseño.
  */
 export default function FitToScreen({ children }: { children: ReactNode }) {
-  const [scale, setScale] = useState(1);
+  const [box, setBox] = useState({ scale: 1, height: 720 });
 
   useEffect(() => {
     const fit = () => {
@@ -22,8 +24,19 @@ export default function FitToScreen({ children }: { children: ReactNode }) {
       // cuando aparece o desaparece la barra del navegador.
       const width = window.innerWidth || document.documentElement.clientWidth;
       const height = window.innerHeight || document.documentElement.clientHeight;
-      const next = Math.min(width / DESIGN_WIDTH, height / DESIGN_HEIGHT);
-      if (next > 0) setScale(next);
+      if (width <= 0 || height <= 0) return;
+
+      // Se escala por ancho y la altura se acomoda: así no quedan bandas negras
+      // en pantallas que no son 16:9 exacto, que son casi todas.
+      let scale = width / DESIGN_WIDTH;
+      let designHeight = height / scale;
+
+      if (designHeight > MAX_HEIGHT || designHeight < MIN_HEIGHT) {
+        designHeight = Math.min(MAX_HEIGHT, Math.max(MIN_HEIGHT, designHeight));
+        scale = Math.min(width / DESIGN_WIDTH, height / designHeight);
+      }
+
+      setBox({ scale, height: designHeight });
     };
 
     fit();
@@ -69,9 +82,9 @@ export default function FitToScreen({ children }: { children: ReactNode }) {
       <div
         style={{
           width: DESIGN_WIDTH,
-          height: DESIGN_HEIGHT,
+          height: box.height,
           flex: 'none',
-          transform: `scale(${scale})`,
+          transform: `scale(${box.scale})`,
           transformOrigin: 'center',
         }}
       >

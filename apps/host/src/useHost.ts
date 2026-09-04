@@ -38,6 +38,7 @@ export function useHost() {
   const [games, setGames] = useState<GameInfo[]>([]);
   const [status, setStatus] = useState<HostStatus>('connecting');
   const [error, setError] = useState<string | null>(null);
+  const [stalled, setStalled] = useState(false);
   const clockOffset = useRef(0);
 
   useEffect(() => {
@@ -69,13 +70,23 @@ export function useHost() {
       );
     };
 
+    // Si en unos segundos no hubo conexión, hay algo mal: mejor decirlo que
+    // dejar un "Conectando..." eterno.
+    const stall = setTimeout(() => {
+      if (!socket.connected) setStalled(true);
+    }, 6000);
+    const onceConnected = () => setStalled(false);
+
     socket.on('connect', onConnect);
+    socket.on('connect', onceConnected);
     socket.on(EV.hostFrame, onFrame);
     socket.on(EV.sfx, playSfx);
     if (socket.connected) onConnect();
 
     return () => {
+      clearTimeout(stall);
       socket.off('connect', onConnect);
+      socket.off('connect', onceConnected);
       socket.off(EV.hostFrame, onFrame);
       socket.off(EV.sfx, playSfx);
     };
@@ -112,14 +123,6 @@ export function useHost() {
   const action = useCallback((a: HostAction) => socket.emit(EV.hostAction, a), []);
   const backToLobby = useCallback(() => socket.emit(EV.hostReturnToLobby), []);
 
-  const addBot = useCallback(() => {
-    socket.emit(EV.hostAddBot, {}, (ack: { ok: boolean; error?: string }) => {
-      if (!ack?.ok) setError(ack?.error ?? 'No se pudo agregar el bot');
-    });
-  }, []);
-
-  const removeBots = useCallback(() => socket.emit(EV.hostRemoveBots, {}), []);
-
   const closeRoom = useCallback(() => {
     localStorage.removeItem(SESSION_KEY);
     setFrame(null);
@@ -130,14 +133,13 @@ export function useHost() {
     frame,
     games,
     status,
+    stalled,
     error,
     createRoom,
     startGame,
     action,
     backToLobby,
     closeRoom,
-    addBot,
-    removeBots,
     clockOffset,
   };
 }

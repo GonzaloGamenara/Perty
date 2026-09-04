@@ -130,6 +130,7 @@ io.on('connection', (socket) => {
   socket.on(EV.hostCreate, (_payload: unknown, ack: unknown) => {
     // El QR sale de la URL por la que entró esta tele, no de una variable.
     const room = store.create(originFromHeaders(socket.handshake.headers));
+    room.setCatalog(registry.catalog());
     room.hostSocketId = socket.id;
     Object.assign(session(socket), { code: room.code, role: 'host' });
     reply<HostCreateAck>(ack, {
@@ -145,6 +146,7 @@ io.on('connection', (socket) => {
     const room = store.get(payload?.code);
     if (!room || room.hostToken !== payload?.hostToken) return reply(ack, fail('Sala no encontrada'));
     room.hostSocketId = socket.id;
+    room.setCatalog(registry.catalog());
     store.refreshJoinUrl(room, originFromHeaders(socket.handshake.headers));
     Object.assign(session(socket), { code: room.code, role: 'host' });
     reply<HostCreateAck>(ack, {
@@ -244,11 +246,32 @@ io.on('connection', (socket) => {
     const action = payload as { t?: string };
     if (!action?.t) return;
 
-    if (action.t === 'ready' && room.phase === 'lobby') {
-      // El VIP arranca desde el celu sin tocar la tele.
-      if (room.isVip(playerId)) startDefaultGame(room);
+    // El armado se maneja desde el celular del VIP: a la tele no se le hace clic.
+    if (room.phase === 'lobby' || room.phase === 'results') {
+      if (!room.isVip(playerId)) return;
+      const lobby = action as { t: string; gameId?: string; id?: string; value?: unknown };
+
+      if (lobby.t === 'selectGame') return room.selectGame(String(lobby.gameId ?? ''));
+      if (lobby.t === 'setSetting') {
+        return room.setSetting(String(lobby.id ?? ''), lobby.value as never);
+      }
+      if (lobby.t === 'addBot') {
+        bots.add(room);
+        return;
+      }
+      if (lobby.t === 'removeBots') {
+        bots.removeAll(room);
+        return;
+      }
+      if (lobby.t === 'startGame') {
+        const chosen = room.chosen;
+        const module = registry.get(chosen.gameId ?? '');
+        if (module) room.startGame(module, chosen.settings);
+        return;
+      }
       return;
     }
+
     room.playerAction(playerId, action as never);
   });
 
@@ -257,13 +280,6 @@ io.on('connection', (socket) => {
     room?.detachSocket(socket.id);
   });
 });
-
-function startDefaultGame(room: Room): void {
-  const first = registry.catalog()[0];
-  if (!first) return;
-  const module = registry.get(first.id);
-  if (module) room.startGame(module); // sin settings: cada juego usa sus defaults
-}
 
 // ---------------------------------------------------------------------------
 // HTTP
