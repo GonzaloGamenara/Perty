@@ -107,16 +107,18 @@ export class Room {
       color: PLAYER_COLORS[this.order.length % PLAYER_COLORS.length]!,
       emoji: AVATARS.find((a) => !used.has(a)) ?? AVATARS[this.order.length % AVATARS.length]!,
       connected: true,
-      isVip: this.order.length === 0,
+      // Un bot nunca manda: si lo hiciera, nadie podría arrancar la partida.
+      isVip: false,
       ...(options.isBot ? { isBot: true } : {}),
     };
     const token = randomToken();
     this.records.set(id, { player, token, socketId: null, lastSeen: Date.now() });
     this.order.push(id);
+    this.ensureVip();
 
     if (this.phase === 'game') this.runtime?.dispatch({ t: 'playerJoined', playerId: id });
     this.touch();
-    return { player, token };
+    return { player: this.records.get(id)!.player, token };
   }
 
   authenticate(id: PlayerId, token: string): boolean {
@@ -158,16 +160,29 @@ export class Room {
   removePlayer(id: PlayerId): void {
     if (!this.records.delete(id)) return;
     this.order = this.order.filter((pid) => pid !== id);
-    // El VIP se hereda al siguiente en orden de llegada.
-    if (!this.players.some((p) => p.isVip)) {
-      const next = this.order[0];
-      if (next) {
-        const record = this.records.get(next)!;
-        record.player = { ...record.player, isVip: true };
-      }
-    }
+    this.ensureVip();
     if (this.phase === 'game') this.runtime?.dispatch({ t: 'playerLeft', playerId: id });
     this.touch();
+  }
+
+  /**
+   * La corona la lleva el primer humano que llegó. Se recalcula al entrar o
+   * salir alguien, porque si quedara en manos de un bot nadie podría arrancar.
+   */
+  private ensureVip(): void {
+    const humans = this.order
+      .map((pid) => this.records.get(pid)!)
+      .filter((record) => !record.player.isBot);
+    const crown = humans.some((record) => record.player.isVip)
+      ? humans.find((record) => record.player.isVip)
+      : humans[0];
+
+    for (const record of this.records.values()) {
+      const shouldRule = record === crown;
+      if (record.player.isVip !== shouldRule) {
+        record.player = { ...record.player, isVip: shouldRule };
+      }
+    }
   }
 
   isVip(id: PlayerId): boolean {

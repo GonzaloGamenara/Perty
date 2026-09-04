@@ -27,7 +27,7 @@ function spawn(brain: Brain): Socket {
   let mash: NodeJS.Timeout | null = null;
 
   socket.on('connect', () => {
-    socket.emit(EV.playerJoin, { code, name: brain.name }, (ack: { ok: boolean; error?: string }) => {
+    socket.emit(EV.playerJoin, { code, name: brain.name, bot: true }, (ack: { ok: boolean; error?: string }) => {
       if (!ack?.ok) {
         console.error(`✗ ${brain.name}: ${ack?.error}`);
         socket.close();

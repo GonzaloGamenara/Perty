@@ -16,7 +16,7 @@
     "build": "npm run build -w @perty/host && npm run build -w @perty/controller",
     "start": "npm run start -w @perty/server",
     "typecheck": "tsc -b --pretty",
-    "test": "node --import tsx --test packages/games/test/*.test.ts apps/server/test/*.test.ts",
+    "test": "node --import tsx --test packages/*/test/*.test.ts apps/server/test/*.test.ts",
     "bots": "npm run bots -w @perty/server --"
   },
   "devDependencies": {

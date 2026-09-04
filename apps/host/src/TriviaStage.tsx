@@ -23,6 +23,9 @@ export default function TriviaStage({ view, room, clockOffset }: Props) {
           </Fade>
         </AnimatePresence>
       </div>
+      {view.kind === 'trivia/question' && (
+        <Urgency deadline={view.endsAt} clockOffset={clockOffset} />
+      )}
       <HudBar hud={view.hud} players={players} />
     </Stage>
   );
@@ -174,12 +177,28 @@ function Body({
             {view.text}
           </h2>
           <ChoiceGrid choices={view.choices} correctId={view.correctChoiceId} />
-          {view.note && <p className="text-xl text-white/40 italic">{view.note}</p>}
+          {view.note && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 2.6 }}
+              className="text-xl text-white/40 italic"
+            >
+              {view.note}
+            </motion.p>
+          )}
           <div className="flex flex-wrap gap-4">
-            {view.outcomes.map((outcome) => {
+            {view.outcomes.map((outcome, index) => {
               const player = players.get(outcome.playerId);
               if (!player) return null;
-              return <OutcomeCard key={outcome.playerId} outcome={outcome} player={player} />;
+              return (
+                <OutcomeCard
+                  key={outcome.playerId}
+                  outcome={outcome}
+                  player={player}
+                  delay={1.3 + index * 0.18}
+                />
+              );
             })}
           </div>
         </div>
@@ -199,6 +218,27 @@ function Body({
         </div>
       );
   }
+}
+
+/** Los últimos cinco segundos laten en rojo desde los bordes de la pantalla. */
+function Urgency({
+  deadline,
+  clockOffset,
+}: {
+  deadline: number;
+  clockOffset: { current: number };
+}) {
+  const { ms } = useCountdown(deadline, clockOffset);
+  if (ms <= 0 || ms > 5000) return null;
+  return (
+    <motion.div
+      aria-hidden
+      className="pointer-events-none absolute inset-0 z-20"
+      animate={{ opacity: [0.25, 0.75, 0.25] }}
+      transition={{ repeat: Infinity, duration: 0.85 }}
+      style={{ boxShadow: 'inset 0 0 160px 24px rgba(239, 68, 68, 0.85)' }}
+    />
+  );
 }
 
 function Spotlighted({
@@ -243,10 +283,19 @@ function ChoiceGrid({ choices, correctId }: { choices: Choice[]; correctId?: str
         return (
           <motion.div
             key={choice.id}
-            animate={{ scale: isCorrect ? 1.02 : 1, opacity: dimmed ? 0.2 : 1 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 22 }}
+            animate={{ scale: isCorrect ? 1.05 : 1, opacity: dimmed ? 0.12 : 1 }}
+            transition={{
+              // La correcta llega un pelín después: el ojo la encuentra sola.
+              delay: isCorrect ? 0.2 : 0,
+              type: 'spring',
+              stiffness: 280,
+              damping: 16,
+            }}
             className={`flex items-center gap-5 rounded-3xl px-7 py-5 ${isCorrect ? 'ring-6 ring-white' : ''}`}
-            style={{ backgroundColor: slot.color }}
+            style={{
+              backgroundColor: slot.color,
+              boxShadow: isCorrect ? '0 0 70px rgba(255,255,255,0.4)' : undefined,
+            }}
           >
             <span className="text-5xl">{slot.shape}</span>
             <span className="text-4xl leading-tight font-black text-white drop-shadow">
@@ -260,7 +309,15 @@ function ChoiceGrid({ choices, correctId }: { choices: Choice[]; correctId?: str
   );
 }
 
-function OutcomeCard({ outcome, player }: { outcome: Outcome; player: Player }) {
+function OutcomeCard({
+  outcome,
+  player,
+  delay,
+}: {
+  outcome: Outcome;
+  player: Player;
+  delay: number;
+}) {
   const tone = outcome.correct
     ? 'border-emerald-400/50 bg-emerald-400/10'
     : outcome.choiceId
@@ -268,8 +325,9 @@ function OutcomeCard({ outcome, player }: { outcome: Outcome; player: Player }) 
       : 'border-white/10 bg-white/5';
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 24, scale: 0.9 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ delay, type: 'spring', stiffness: 320, damping: 20 }}
       className={`flex items-center gap-3 rounded-2xl border px-4 py-3 ${tone}`}
     >
       <Avatar player={player} size="sm" />
@@ -356,8 +414,10 @@ function Standings({ hud, players }: { hud: Hud; players: Map<string, Player> })
           <motion.div
             key={row.playerId}
             layout
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.14, type: 'spring', stiffness: 300, damping: 26 }}
             className="flex items-center gap-5"
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           >
             <span className="w-10 text-3xl font-black text-white/25">{index + 1}</span>
             <Avatar player={player} size="sm" />

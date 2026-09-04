@@ -201,11 +201,12 @@ io.on('connection', (socket) => {
 
   // -- celulares -------------------------------------------------------------
 
-  socket.on(EV.playerJoin, (payload: { code?: string; name?: string }, ack: unknown) => {
+  socket.on(EV.playerJoin, (payload: { code?: string; name?: string; bot?: boolean }, ack: unknown) => {
     const room = store.get(payload?.code);
     if (!room) return reply(ack, fail('No existe esa sala'));
     // Se puede entrar con la partida empezada: arrancás con 0 monedas.
-    const result = room.addPlayer(String(payload?.name ?? ''));
+    // Declararse bot solo quita privilegios (nunca manda), así que es seguro.
+    const result = room.addPlayer(String(payload?.name ?? ''), { isBot: payload?.bot === true });
     if ('error' in result) return reply(ack, fail(result.error));
 
     room.attachSocket(result.player.id, socket.id);
