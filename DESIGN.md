@@ -50,6 +50,7 @@ entera corra en 17ms sin esperar un solo segundo real.
 | `buzzer` | el primero que aprieta |
 | `tapper` | machacar el botón |
 | `text` | escribir algo (con `numeric` abre el teclado de números) |
+| `form` | varios campos a la vez; los valores suben mientras se tipea, y puede traer un botón para cerrar la ronda |
 
 **La regla:** si una mecánica nueva necesita una pantalla que no está en esta
 lista, agregá la primitiva antes que un componente a medida. Eso mantiene la app
@@ -339,7 +340,37 @@ rebaño se ve de una, y la vaca viaja de avatar a avatar con un `layoutId`.
 
 ---
 
-## 9. La Noche · reglas actuales
+## 9. Tutti Frutti · reglas actuales
+
+Una letra al azar, unas columnas sorteadas y el reloj. Es el primer juego que
+necesitó una primitiva nueva en el celular: **`form`**, varios campos a la vez.
+
+- Respuesta **única 100**, **repetida 50**, y **0** si está vacía o no empieza
+  con la letra. La comparación usa el `normalize()` de siempre, así que "Águila"
+  y "AGUILA" son la misma.
+- Nadie valida que "Amesa" sea un animal. Eso lo discute la mesa mirando la tele,
+  igual que en la hoja de papel — y esa discusión es medio juego.
+- **¡BASTA!** cierra la ronda para todos, pero **solo con la hoja llena**. Si no,
+  cortar temprano sería una forma gratis de arruinarle la ronda al resto. Cerrar
+  con todo válido paga **+150**; con algo mal, nada.
+- **Los valores viajan mientras se tipea** (cada 350 ms). Sin eso, el que grita
+  basta dejaría a los demás con la hoja en blanco, que es lo contrario del juego.
+- Si **todos** completaron la hoja, la ronda cierra sola sin `stopper`: nadie
+  cortó nada, simplemente terminaron. Sin esto la mesa se quedaba mirando el
+  reloj hasta el final — lo encontró un test.
+
+**Letras.** Salen de `BASTA_LETTERS`, que excluye K, Ñ, Q, W, X, Y y Z: con esas
+la ronda no es difícil, es injusta. Y no se repite ninguna mientras queden.
+
+**La tele nunca muestra lo que están escribiendo** — solo cuántas columnas lleva
+llenas cada uno, como puntitos que se prenden. Hay un test que serializa la vista
+del host y falla si se filtra una respuesta.
+
+**Medallas:** El de la Campana, Original, Lo Obvio, Impecable, Hoja en Blanco.
+
+---
+
+## 10. La Noche · reglas actuales
 
 No es un juego: es una secuencia de juegos, y por eso **no implementa
 `GameModule`**. La orquesta la sala, que es la única que puede arrancar y
@@ -367,7 +398,7 @@ completas seguidas eran interminables. El jefe además escala su vida con
 
 ---
 
-## 10. Hoja de ruta
+## 11. Hoja de ruta
 
 ### Mecánicas para sumar (ordenadas por relación diversión/esfuerzo)
 
@@ -407,7 +438,7 @@ completas seguidas eran interminables. El jefe además escala su vida con
 
 ---
 
-## 11. Cosas que ya están resueltas y conviene no romper
+## 12. Cosas que ya están resueltas y conviene no romper
 
 - **Reconexión.** El celular guarda su sesión: si se bloquea la pantalla o se
   recarga la página, vuelve a la partida con sus monedas. La tele también se

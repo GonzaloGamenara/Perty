@@ -1,4 +1,5 @@
 import { GameRegistry } from '@perty/engine';
+import { bastaGame } from './basta';
 import { bossGame } from './boss';
 import { liarGame } from './liar';
 import { pollGame } from './poll';
@@ -14,7 +15,8 @@ export function createRegistry(): GameRegistry {
     .register(liarGame)
     .register(priceGame)
     .register(quipsGame)
-    .register(pollGame);
+    .register(pollGame)
+    .register(bastaGame);
 }
 
 export { triviaGame, TRIVIA_INFO, defaultTriviaConfig } from './trivia';
@@ -33,4 +35,13 @@ export { quipsGame, QUIPS_INFO, defaultQuipConfig, QUIP_PROMPTS, resolvePrompt }
 export type * from './quips/types';
 export { pollGame, POLL_INFO, defaultPollConfig, POLL_PROMPTS } from './poll';
 export type * from './poll/types';
+export {
+  bastaGame,
+  BASTA_INFO,
+  defaultBastaConfig,
+  BASTA_COLUMNS,
+  BASTA_LETTERS,
+  startsWithLetter,
+} from './basta';
+export type * from './basta/types';
 export { NIGHT_ID, nightInfo, buildNightConfig } from './night';

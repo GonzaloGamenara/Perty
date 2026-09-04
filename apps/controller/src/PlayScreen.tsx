@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   CHOICE_SLOTS,
   type PlayerAction,
@@ -102,6 +102,18 @@ function ViewBody({
 
     case 'text':
       return <TextEntry view={view} act={act} clockOffset={clockOffset} />;
+
+    case 'form':
+      // La key remonta el formulario cuando cambia la ronda: sin eso, lo tipeado
+      // en la ronda anterior se quedaría pegado en los campos.
+      return (
+        <FormEntry
+          key={`${view.badge ?? ''}|${view.fields.map((f) => f.id).join()}`}
+          view={view}
+          act={act}
+          clockOffset={clockOffset}
+        />
+      );
   }
 }
 
@@ -301,6 +313,81 @@ function Tapper({
         <span className="text-5xl font-black tabular-nums">{view.count}</span>
         <span className="text-lg font-bold">{view.label}</span>
       </button>
+    </div>
+  );
+}
+
+function FormEntry({
+  view,
+  act,
+  clockOffset,
+}: {
+  view: Extract<PlayerView, { kind: 'form' }>;
+  act: (action: PlayerAction) => void;
+  clockOffset: { current: number };
+}) {
+  const [values, setValues] = useState<Record<string, string>>(view.values ?? {});
+  const done = !!view.done;
+
+  // Lo tipeado sube solo cada tanto. Si otro cierra la ronda antes de tiempo,
+  // el server ya tiene lo que había escrito cada uno.
+  useEffect(() => {
+    if (done) return;
+    const id = setTimeout(() => act({ t: 'submitForm', values }), 350);
+    return () => clearTimeout(id);
+  }, [values, done, act]);
+
+  const filled = view.fields.every((field) => (values[field.id] ?? '').trim());
+  const canStop = !!view.stop && view.stop.enabled && filled && !done;
+
+  return (
+    <div className="flex h-full flex-col">
+      <TimerBar deadline={view.deadline} clockOffset={clockOffset} />
+      {view.badge && (
+        <div className="mb-2 text-center text-7xl leading-none font-black">{view.badge}</div>
+      )}
+      <p className="text-center text-lg font-black text-balance">{view.prompt}</p>
+      {view.hint && <p className="mt-1 text-center text-xs text-white/45">{view.hint}</p>}
+
+      <div className="mt-3 flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
+        {view.fields.map((field) => (
+          <label key={field.id} className="flex items-center gap-2">
+            <span className="w-24 shrink-0 truncate text-xs font-bold text-white/50 uppercase">
+              {field.emoji} {field.label}
+            </span>
+            <input
+              value={values[field.id] ?? ''}
+              disabled={done}
+              maxLength={view.maxLength}
+              placeholder={field.placeholder}
+              autoComplete="off"
+              autoCorrect="off"
+              onChange={(event) =>
+                setValues((previous) => ({ ...previous, [field.id]: event.target.value }))
+              }
+              className="min-w-0 flex-1 rounded-xl border border-line bg-panel px-3 py-3 font-bold outline-none focus:border-white/40 disabled:opacity-50"
+            />
+          </label>
+        ))}
+      </div>
+
+      {view.stop && (
+        <button
+          type="button"
+          disabled={!canStop}
+          onPointerDown={() => {
+            if (!canStop) return;
+            buzz(40);
+            act({ t: 'submitForm', values, stop: true });
+          }}
+          className="mt-3 rounded-2xl bg-amber-400 py-4 text-xl font-black text-black transition active:scale-[0.98] disabled:opacity-25"
+        >
+          {done ? 'Listo' : view.stop.label}
+        </button>
+      )}
+      {view.stop?.hint && !filled && !done && (
+        <p className="mt-2 text-center text-xs text-white/40">{view.stop.hint}</p>
+      )}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import type { ResultsView } from '@perty/protocol';
 import type {
+  BastaHostView,
   BossHostView,
   LiarHostView,
   PollHostView,
@@ -9,6 +10,7 @@ import type {
   TriviaHostView,
 } from '@perty/games';
 import type { NightHostView } from '@perty/engine';
+import BastaStage from './BastaStage';
 import BossStage from './BossStage';
 import LiarStage from './LiarStage';
 import Lobby from './Lobby';
@@ -22,6 +24,7 @@ import { Stage } from './bits';
 import { useHost } from './useHost';
 
 type GameView =
+  | BastaHostView
   | TriviaHostView
   | BossHostView
   | LiarHostView
@@ -68,6 +71,10 @@ export default function App() {
 
   if (game.kind === 'results') {
     return <Results view={game} room={room} />;
+  }
+
+  if (game.kind.startsWith('basta/')) {
+    return <BastaStage view={game as BastaHostView} room={room} clockOffset={host.clockOffset} />;
   }
 
   if (game.kind.startsWith('boss/')) {

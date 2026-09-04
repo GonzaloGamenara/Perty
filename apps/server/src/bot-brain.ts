@@ -83,6 +83,12 @@ const QUIPS = [
  */
 const HERD = ['perro', 'rojo', 'pizza', 'uno'];
 
+/**
+ * Colas para Tutti Frutti. El bot no sabe si "Amesa" es un animal, pero empieza
+ * con la letra, que es lo único que el juego valida. Sirven para probar.
+ */
+const TAILS = ['ala', 'oso', 'ito', 'uno', 'ero', 'ana', 'illo', 'ura'];
+
 export type BotPlan =
   | { kind: 'once'; delayMs: number; action: PlayerAction }
   | { kind: 'mash'; intervalMs: number; durationMs: number };
@@ -157,6 +163,19 @@ export function decide(view: PlayerView, brain: Brain): BotPlan | null {
           ? pick(HERD)
           : pick(QUIPS);
     return { kind: 'once', delayMs: Math.min(wait, 6000), action: { t: 'submitText', text } };
+  }
+
+  if (view.kind === 'form') {
+    const letter = view.badge ?? 'A';
+    const values = Object.fromEntries(
+      view.fields.map((field) => [field.id, letter + pick(TAILS)]),
+    );
+    // Tarda a propósito: si contestara al toque, cortaría todas las rondas.
+    return {
+      kind: 'once',
+      delayMs: 8_000 + Math.random() * 22_000,
+      action: { t: 'submitForm', values, stop: Math.random() < 0.35 },
+    };
   }
 
   if (view.kind === 'buzzer' && view.armed && !view.pressed) {

@@ -3,7 +3,7 @@
 Central de juegos para jugar en la tele con el celular como control.
 La tele muestra el tablero, cada uno entra desde su celu escaneando un QR.
 
-Seis juegos, y un modo que los encadena:
+Siete juegos, y un modo que los encadena:
 
 - **Trivia Caótica** — todos contra todos. Monedas, estrellas por categoría que
   se roban entre ustedes, y doce modificadores que rompen las reglas cada par de rondas.
@@ -21,6 +21,9 @@ Seis juegos, y un modo que los encadena:
 - **Encuesta** — una consigna boba y todos escriben lo primero que se les viene.
   Cobra el que coincidió con la mayoría, no el que tiene razón. El único que
   queda solo se lleva la vaca 🐄, y terminar con ella cuesta caro.
+- **Tutti Frutti** — una letra al azar, cinco columnas y el reloj. Lo que escribió
+  otro vale la mitad, y el primero que llena toda la hoja grita **¡BASTA!** y le
+  corta la ronda al resto.
 - **La Noche** — varios juegos seguidos con un solo campeón. Cada uno reparte
   pasos según el puesto, entre juego y juego cae un evento que castiga al que va
   ganando, y el último vale doble.

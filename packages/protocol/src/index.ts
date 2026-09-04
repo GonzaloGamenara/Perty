@@ -101,6 +101,25 @@ export type PlayerView =
       deadline?: number;
     }
   | {
+      /**
+       * Varios campos a la vez, para cuando una ronda pide más de una respuesta.
+       * Los valores viajan mientras se tipea, así el que grita "basta" no deja a
+       * los demás con la hoja en blanco.
+       */
+      kind: 'form';
+      prompt: string;
+      hint?: string;
+      /** Lo que manda la ronda y va enorme arriba de todo: una letra, un ícono. */
+      badge?: string;
+      fields: { id: string; label: string; emoji?: string; placeholder?: string }[];
+      maxLength: number;
+      values?: Record<string, string>;
+      /** Botón para cerrar la ronda antes de tiempo. Sin esto no aparece. */
+      stop?: { label: string; enabled: boolean; hint?: string };
+      done?: boolean;
+      deadline?: number;
+    }
+  | {
       kind: 'verdict';
       tone: 'good' | 'bad' | 'neutral';
       title: string;
@@ -134,6 +153,7 @@ export type PlayerAction =
   | { t: 'buzz' }
   | { t: 'tap' }
   | { t: 'submitText'; text: string }
+  | { t: 'submitForm'; values: Record<string, string>; stop?: boolean }
   // Acciones del lobby: solo las puede usar quien manda en la sala.
   | { t: 'selectGame'; gameId: GameId }
   | { t: 'setSetting'; id: string; value: string | number | string[] }
