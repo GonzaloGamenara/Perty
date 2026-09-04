@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import express, { type Request, type Response } from 'express';
 import { Server, type Socket } from 'socket.io';
-import { createRegistry } from '@perty/games';
+import { buildNightConfig, createRegistry, NIGHT_ID, nightInfo } from '@perty/games';
 import type { Room } from '@perty/engine';
 import {
   EV,
@@ -20,6 +20,8 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, '../../..');
 const config = readNetConfig();
 const registry = createRegistry();
+/** El catálogo que ve el lobby incluye La Noche, que no es un juego sino una serie. */
+const catalog = () => [...registry.catalog(), nightInfo(registry.catalog())];
 
 const app = express();
 const http = createServer(app);
@@ -65,7 +67,9 @@ function pushFrames(room: Room): void {
   for (const player of room.players) {
     const view = room.playerGameView(player.id);
 
-    if (player.isBot) {
+    // Los bots del botón los maneja el server; los de `npm run bots` se conectan
+    // por socket como cualquier celular y reciben su frame igual que todos.
+    if (player.isBot && bots.knows(player.id)) {
       bots.handle(room, player.id, view);
       continue;
     }
@@ -130,14 +134,15 @@ io.on('connection', (socket) => {
   socket.on(EV.hostCreate, (_payload: unknown, ack: unknown) => {
     // El QR sale de la URL por la que entró esta tele, no de una variable.
     const room = store.create(originFromHeaders(socket.handshake.headers));
-    room.setCatalog(registry.catalog());
+    room.setCatalog(catalog());
+    room.setResolver((id) => registry.get(id));
     room.hostSocketId = socket.id;
     Object.assign(session(socket), { code: room.code, role: 'host' });
     reply<HostCreateAck>(ack, {
       ok: true,
       code: room.code,
       hostToken: room.hostToken,
-      games: registry.catalog(),
+      games: catalog(),
     });
     markDirty(room);
   });
@@ -146,7 +151,8 @@ io.on('connection', (socket) => {
     const room = store.get(payload?.code);
     if (!room || room.hostToken !== payload?.hostToken) return reply(ack, fail('Sala no encontrada'));
     room.hostSocketId = socket.id;
-    room.setCatalog(registry.catalog());
+    room.setCatalog(catalog());
+    room.setResolver((id) => registry.get(id));
     store.refreshJoinUrl(room, originFromHeaders(socket.handshake.headers));
     Object.assign(session(socket), { code: room.code, role: 'host' });
     reply<HostCreateAck>(ack, {
@@ -163,6 +169,13 @@ io.on('connection', (socket) => {
     (payload: { gameId?: string; settings?: SettingValues }, ack: unknown) => {
       const room = roomOf(socket);
       if (!room || session(socket).role !== 'host') return reply(ack, fail('No sos el host'));
+      if (payload?.gameId === NIGHT_ID) {
+        const error = room.startNight(
+          buildNightConfig(payload.settings ?? {}, registry.catalog(), room.playerCount),
+        );
+        if (error) return reply(ack, fail(error.error));
+        return reply(ack, { ok: true });
+      }
       const module = registry.get(payload?.gameId ?? '');
       if (!module) return reply(ack, fail('Ese juego no existe'));
       const error = room.startGame(module, payload?.settings);
@@ -266,6 +279,12 @@ io.on('connection', (socket) => {
       }
       if (lobby.t === 'startGame') {
         const chosen = room.chosen;
+        if (chosen.gameId === NIGHT_ID) {
+          room.startNight(
+            buildNightConfig(chosen.settings, registry.catalog(), room.playerCount),
+          );
+          return;
+        }
         const module = registry.get(chosen.gameId ?? '');
         if (module) room.startGame(module, chosen.settings);
         return;

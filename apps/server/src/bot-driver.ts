@@ -27,6 +27,11 @@ export class BotDriver {
     return { player: { id: result.player.id, name: result.player.name } };
   }
 
+  /** ¿Este jugador lo maneja el server? Los bots por socket se manejan solos. */
+  knows(playerId: PlayerId): boolean {
+    return this.brains.has(playerId);
+  }
+
   removeAll(room: Room): number {
     const bots = room.bots;
     for (const bot of bots) {

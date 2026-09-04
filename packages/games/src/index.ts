@@ -25,3 +25,4 @@ export { liarGame, LIAR_INFO, defaultLiarConfig, LIAR_PROMPTS, normalize } from 
 export type * from './liar/types';
 export { priceGame, PRICE_INFO, defaultPriceConfig, PRICE_QUESTIONS, parseGuess, buildScale } from './price';
 export type * from './price/types';
+export { NIGHT_ID, nightInfo, buildNightConfig } from './night';

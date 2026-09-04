@@ -141,6 +141,8 @@ export const triviaGame: GameModule<TriviaState, TriviaConfig> = {
     };
   },
 
+  quickConfig: () => ({ ...defaultTriviaConfig(), rounds: 6, standingsEvery: 99, chaosWarmup: 1 }),
+
   create(ctx, config) {
     const state: TriviaState = {
       config,

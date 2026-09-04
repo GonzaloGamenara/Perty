@@ -109,6 +109,8 @@ export const liarGame: GameModule<LiarState, LiarConfig> = {
     };
   },
 
+  quickConfig: () => ({ ...defaultLiarConfig(), rounds: 4, standingsEvery: 99 }),
+
   create(ctx, config) {
     const state: LiarState = {
       config,

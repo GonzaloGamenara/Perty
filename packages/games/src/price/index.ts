@@ -126,6 +126,8 @@ export const priceGame: GameModule<PriceState, PriceConfig> = {
     };
   },
 
+  quickConfig: () => ({ ...defaultPriceConfig(), rounds: 5, standingsEvery: 99 }),
+
   create(ctx, config) {
     const state: PriceState = {
       config,

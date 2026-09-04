@@ -39,6 +39,8 @@ export interface BossConfig {
   hearts: number;
   /** Tope de rondas: si no lo bajan a tiempo, el jefe gana. */
   maxRounds: number;
+  /** Escala la vida del jefe. Con menos rondas hay que bajarla o es invencible. */
+  hpScale: number;
 }
 
 // -- mecánicas --------------------------------------------------------------

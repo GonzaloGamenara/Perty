@@ -61,6 +61,11 @@ export interface GameModule<S = any, C = any> {
    * y recorta lo suyo: el server nunca confía en los valores que llegan.
    */
   configure?(settings: SettingValues, playerCount: number): C;
+  /**
+   * Versión corta, para cuando el juego es una etapa de La Noche y no la noche
+   * entera. Si no está, se usa la config por defecto (y la noche se hace larga).
+   */
+  quickConfig?(playerCount: number): C;
   create(ctx: GameCtx, config: C): Reduction<S>;
   reduce(state: S, event: GameEvent, ctx: GameCtx): Reduction<S>;
   /** Vista de la tele. Cada juego define su propia unión discriminada por `kind`. */

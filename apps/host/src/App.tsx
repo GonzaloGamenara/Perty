@@ -6,16 +6,25 @@ import type {
   PriceHostView,
   TriviaHostView,
 } from '@perty/games';
+import type { NightHostView } from '@perty/engine';
 import BossStage from './BossStage';
 import LiarStage from './LiarStage';
 import Lobby from './Lobby';
+import NightStage from './NightStage';
 import PriceStage from './PriceStage';
 import Results from './Results';
 import TriviaStage from './TriviaStage';
 import { Stage } from './bits';
 import { useHost } from './useHost';
 
-type GameView = TriviaHostView | BossHostView | LiarHostView | PriceHostView | ResultsView | null;
+type GameView =
+  | TriviaHostView
+  | BossHostView
+  | LiarHostView
+  | PriceHostView
+  | NightHostView
+  | ResultsView
+  | null;
 
 export default function App() {
   const host = useHost();
@@ -61,6 +70,10 @@ export default function App() {
 
   if (game.kind.startsWith('liar/')) {
     return <LiarStage view={game as LiarHostView} room={room} clockOffset={host.clockOffset} />;
+  }
+
+  if (game.kind.startsWith('night/')) {
+    return <NightStage view={game as NightHostView} room={room} />;
   }
 
   if (game.kind.startsWith('price/')) {

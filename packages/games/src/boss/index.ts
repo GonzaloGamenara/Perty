@@ -99,6 +99,7 @@ export function defaultBossConfig(): BossConfig {
     finaleMs: 8_000,
     hearts: 3,
     maxRounds: 14,
+    hpScale: 1,
   };
 }
 
@@ -131,9 +132,13 @@ export const bossGame: GameModule<BossState, BossConfig> = {
     };
   },
 
+  quickConfig: () => ({ ...defaultBossConfig(), maxRounds: 8, hpScale: 0.5 }),
+
   create(ctx, config) {
     const boss = getBoss(config.bossId) ?? ctx.rng.pick(BOSSES);
-    const maxHp = boss.hpPerPlayer * Math.max(2, ctx.players.length);
+    const maxHp = Math.round(
+      boss.hpPerPlayer * Math.max(2, ctx.players.length) * config.hpScale,
+    );
     const state: BossState = {
       config,
       boss,

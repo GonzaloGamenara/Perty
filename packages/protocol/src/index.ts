@@ -21,7 +21,8 @@ export interface Player {
   isBot?: boolean;
 }
 
-export type RoomPhase = 'lobby' | 'game' | 'results';
+/** `night` son los intermedios de La Noche: tablero y eventos entre juegos. */
+export type RoomPhase = 'lobby' | 'game' | 'night' | 'results';
 
 export interface RoomSnapshot {
   code: RoomCode;
