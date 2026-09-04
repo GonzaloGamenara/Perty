@@ -177,7 +177,7 @@ revelación → (estrella) → cada 4 rondas, tabla.
 + 50 si fuiste el primero
 ```
 
-**Estrellas.** Hay una por categoría (8 en total, valen 300 monedas al final).
+**Estrellas.** Hay una por categoría (12 en total, valen 300 monedas al final).
 
 - Llegás a **2 aciertos** en una categoría → reclamás su estrella si está libre.
 - Si la tiene otro, **se la robás**… salvo que el dueño también haya acertado y

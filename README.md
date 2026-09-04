@@ -209,9 +209,10 @@ Los detalles de cómo sumar juegos, mecánicas y preguntas están en
 
 ## Sumar preguntas
 
-El banco arranca con **281 preguntas** repartidas en 8 categorías (35 por tema),
-**80 consignas** para Mentiroso y **44 preguntas numéricas** para El Precio Justo. Una partida de trivia usa 12 preguntas y una de
-jefe hasta 15, así que da para varias noches sin repetir.
+El banco arranca con **421 preguntas** repartidas en 12 categorías (35 por tema),
+**120 consignas** para Mentiroso y **68 preguntas numéricas** para El Precio Justo.
+Una partida de trivia usa 12 preguntas y una de jefe hasta 15, así que da para
+varias noches sin repetir.
 
 Para la trivia y el jefe, editá
 [`packages/games/src/trivia/questions.ts`](packages/games/src/trivia/questions.ts).

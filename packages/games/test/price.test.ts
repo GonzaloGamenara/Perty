@@ -87,7 +87,7 @@ describe('precio justo · ronda', () => {
 
     game.guess('ana', answer + 1);
     game.guess('beto', answer + 10);
-    game.guess('cami', answer - 100);
+    game.guess('cami', answer + 500);
 
     assert.equal(game.state.phase.kind, 'reveal', 'tiraron todos y no se reveló');
     assert.equal(game.outcome('ana').rank, 1);
@@ -117,8 +117,9 @@ describe('precio justo · ronda', () => {
     game.runTo('guess');
     const answer = game.answer();
 
-    game.guess('ana', answer + 5);
-    game.guess('beto', answer - 5);
+    // Offsets chicos a propósito: hay respuestas de un dígito en el banco.
+    game.guess('ana', answer + 1);
+    game.guess('beto', answer - 1);
     game.guess('cami', answer + 50);
 
     assert.equal(game.outcome('ana').rank, 1);
@@ -155,9 +156,10 @@ describe('precio justo · regla de la casa', () => {
     game.runTo('guess');
     const answer = game.answer();
 
-    // Ana se pasa por poquito, Beto se queda corto por mucho.
+    // Ana se pasa por poquito, Beto se queda corto. La mitad siempre es válida:
+    // restar un número fijo daría negativo con las respuestas más chicas.
     game.guess('ana', answer + 1);
-    game.guess('beto', answer - 1000);
+    game.guess('beto', Math.floor(answer / 2));
 
     const ana = game.outcome('ana');
     assert.equal(ana.over, true);
@@ -172,7 +174,7 @@ describe('precio justo · regla de la casa', () => {
     const answer = game.answer();
 
     game.guess('ana', answer + 1);
-    game.guess('beto', answer - 1000);
+    game.guess('beto', Math.floor(answer / 2));
 
     assert.equal(game.outcome('ana').over, false);
     assert.equal(game.outcome('ana').rank, 1);

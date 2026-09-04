@@ -10,6 +10,10 @@ export const CATEGORIES: Category[] = [
   { id: 'series', name: 'Series', emoji: '📺', color: '#ff922b' },
   { id: 'comida', name: 'Comida', emoji: '🍕', color: '#ff4d6d' },
   { id: 'cultura', name: 'Cultura General', emoji: '🌍', color: '#22d3ee' },
+  { id: 'deportes', name: 'Deportes', emoji: '⚽', color: '#34d399' },
+  { id: 'musica', name: 'Música', emoji: '🎸', color: '#e879f9' },
+  { id: 'historia', name: 'Historia', emoji: '🏛️', color: '#fbbf24' },
+  { id: 'internet', name: 'Internet', emoji: '💾', color: '#60a5fa' },
 ];
 
 const BY_ID = new Map(CATEGORIES.map((c) => [c.id, c]));

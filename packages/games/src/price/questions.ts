@@ -67,4 +67,36 @@ export const PRICE_QUESTIONS: PriceQuestion[] = [
   { id: 'pcu4', category: 'cultura', text: '¿Cuántos países miembros tiene la ONU?', answer: 193, unit: 'países' },
   { id: 'pcu5', category: 'cultura', text: '¿A cuántos miles de kilómetros está la Luna en promedio?', answer: 384, unit: 'miles de km' },
   { id: 'pcu6', category: 'cultura', text: '¿Cuántos kilómetros mide el ecuador terrestre?', answer: 40075, unit: 'km' },
+
+  // -- deportes -------------------------------------------------------------
+  { id: 'pde1', category: 'deportes', text: '¿En qué año se jugó el primer Mundial de fútbol?', answer: 1930, unit: 'año' },
+  { id: 'pde2', category: 'deportes', text: '¿Cuántos metros de largo tiene una pileta olímpica?', answer: 50, unit: 'metros' },
+  { id: 'pde3', category: 'deportes', text: 'Contando los dos equipos, ¿cuántos jugadores hay en una cancha de fútbol?', answer: 22, unit: 'jugadores' },
+  { id: 'pde4', category: 'deportes', text: '¿En qué año ganó Argentina su primer Mundial?', answer: 1978, unit: 'año' },
+  { id: 'pde5', category: 'deportes', text: '¿Cuántos minutos dura un partido de básquet FIBA sin contar prórrogas?', answer: 40, unit: 'minutos' },
+  { id: 'pde6', category: 'deportes', text: '¿Cuántos kilómetros recorre el Tour de France, más o menos?', answer: 3500, unit: 'km' },
+
+  // -- música ---------------------------------------------------------------
+  { id: 'pmu1', category: 'musica', text: '¿En qué año se separaron los Beatles?', answer: 1970, unit: 'año' },
+  { id: 'pmu2', category: 'musica', text: '¿Cuántas teclas negras tiene un piano estándar?', answer: 36, unit: 'teclas' },
+  { id: 'pmu3', category: 'musica', text: '¿En qué año murió Freddie Mercury?', answer: 1991, unit: 'año' },
+  { id: 'pmu4', category: 'musica', text: '¿En qué año salió "Bohemian Rhapsody"?', answer: 1975, unit: 'año' },
+  { id: 'pmu5', category: 'musica', text: '¿En qué año se hizo el festival de Woodstock?', answer: 1969, unit: 'año' },
+  { id: 'pmu6', category: 'musica', text: '¿En qué año se formó Soda Stereo?', answer: 1982, unit: 'año' },
+
+  // -- historia -------------------------------------------------------------
+  { id: 'phi1', category: 'historia', text: '¿En qué año cayó el Muro de Berlín?', answer: 1989, unit: 'año' },
+  { id: 'phi2', category: 'historia', text: '¿En qué año empezó la Revolución Francesa?', answer: 1789, unit: 'año' },
+  { id: 'phi3', category: 'historia', text: '¿En qué año fue la Revolución de Mayo?', answer: 1810, unit: 'año' },
+  { id: 'phi4', category: 'historia', text: '¿En qué año terminó la Segunda Guerra Mundial?', answer: 1945, unit: 'año' },
+  { id: 'phi5', category: 'historia', text: '¿Cuántos años tiene más o menos la Gran Pirámide de Guiza?', answer: 4500, unit: 'años' },
+  { id: 'phi6', category: 'historia', text: '¿En qué año pisó el hombre la Luna por primera vez?', answer: 1969, unit: 'año' },
+
+  // -- internet -------------------------------------------------------------
+  { id: 'pin1', category: 'internet', text: '¿En qué año se fundó Google?', answer: 1998, unit: 'año' },
+  { id: 'pin2', category: 'internet', text: '¿En qué año se creó YouTube?', answer: 2005, unit: 'año' },
+  { id: 'pin3', category: 'internet', text: '¿Cuántos caracteres entran hoy en un tweet?', answer: 280, unit: 'caracteres' },
+  { id: 'pin4', category: 'internet', text: '¿En qué año se lanzó Wikipedia?', answer: 2001, unit: 'año' },
+  { id: 'pin5', category: 'internet', text: '¿En qué año se lanzó WhatsApp?', answer: 2009, unit: 'año' },
+  { id: 'pin6', category: 'internet', text: '¿En qué año se envió el primer correo electrónico?', answer: 1971, unit: 'año' },
 ];
