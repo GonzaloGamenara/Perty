@@ -35,7 +35,7 @@ export default function LobbyScreen({
             <GameCard
               key={game.id}
               game={game}
-              enough={view.playerCount >= game.minPlayers}
+              missing={Math.max(0, game.minPlayers - view.playerCount)}
               onPick={() => {
                 buzz(18);
                 act({ t: 'selectGame', gameId: game.id });
@@ -156,24 +156,25 @@ function Footer({
 
 function GameCard({
   game,
-  enough,
+  missing,
   onPick,
 }: {
   game: GameInfo;
-  enough: boolean;
+  /** Cuanta gente falta para poder elegirlo. Cero significa que ya entra. */
+  missing: number;
   onPick: () => void;
 }) {
   return (
     <button
       onClick={onPick}
-      disabled={!enough}
+      disabled={missing > 0}
       className="flex flex-col items-center gap-1 rounded-2xl border border-line bg-panel p-4 text-center transition active:scale-[0.97] disabled:opacity-35"
     >
       <span className="text-4xl">{game.emoji}</span>
       <span className="text-sm leading-tight font-black text-balance">{game.name}</span>
-      {!enough && (
+      {missing > 0 && (
         <span className="text-[11px] font-bold text-amber-400">
-          Faltan {game.minPlayers} jugadores
+          {missing === 1 ? 'Falta 1 jugador' : `Faltan ${missing} jugadores`}
         </span>
       )}
     </button>

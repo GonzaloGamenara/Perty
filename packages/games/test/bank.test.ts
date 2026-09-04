@@ -4,6 +4,7 @@ import { CATEGORIES } from '../src/trivia/categories';
 import { QUESTIONS } from '../src/trivia/questions';
 import { LIAR_PROMPTS } from '../src/liar/prompts';
 import { normalize } from '../src/liar/index';
+import { QUIP_PROMPTS } from '../src/quips/prompts';
 
 /**
  * Los bancos se editan a mano y crecen solos. Estos tests son el guardarraíl:
@@ -126,6 +127,52 @@ describe('banco de mentiroso', () => {
     for (const category of CATEGORIES) {
       const count = LIAR_PROMPTS.filter((p) => p.category === category.id).length;
       assert.ok(count >= 5, `${category.name} tiene ${count} consignas, hacen falta 5`);
+    }
+  });
+});
+
+describe('banco de superlativos', () => {
+  const TONES = ['clasico', 'nerd', 'personal'] as const;
+
+  it('no tiene ids repetidos', () => {
+    const seen = new Set<string>();
+    for (const prompt of QUIP_PROMPTS) {
+      assert.ok(!seen.has(prompt.id), `id repetido: ${prompt.id}`);
+      seen.add(prompt.id);
+    }
+  });
+
+  it('no repite consignas', () => {
+    const seen = new Set<string>();
+    for (const prompt of QUIP_PROMPTS) {
+      const key = normalize(prompt.text);
+      assert.ok(key.length > 0, `${prompt.id} tiene el enunciado vacío`);
+      assert.ok(!seen.has(key), `consigna repetida: ${prompt.id}`);
+      seen.add(key);
+    }
+  });
+
+  it('tiene consignas de sobra para cada tono', () => {
+    for (const tone of TONES) {
+      const count = QUIP_PROMPTS.filter((p) => p.tone === tone).length;
+      assert.ok(count >= 30, `el tono ${tone} tiene ${count} consignas, hacen falta 30`);
+    }
+  });
+
+  it('el hueco {jugador} es exclusivo del tono personal', () => {
+    for (const prompt of QUIP_PROMPTS) {
+      const hasSlot = prompt.text.includes('{jugador}');
+      assert.equal(
+        hasSlot,
+        prompt.tone === 'personal',
+        `${prompt.id}: solo las consignas personales llevan {jugador}`,
+      );
+    }
+  });
+
+  it('no usa el hueco de Mentiroso, que los bots leen como seña', () => {
+    for (const prompt of QUIP_PROMPTS) {
+      assert.ok(!prompt.text.includes('____'), `${prompt.id} usa ____, que es de Mentiroso`);
     }
   });
 });

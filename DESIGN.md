@@ -100,7 +100,8 @@ modificador y el celular ya sabe pintar las variantes.
 
 ### Preguntas y consignas
 
-Los dos bancos (`trivia/questions.ts` y `liar/prompts.ts`) se editan a mano, así
+Los bancos (`trivia/questions.ts`, `liar/prompts.ts`, `price/questions.ts` y
+`quips/prompts.ts`) se editan a mano, así
 que hay un test que los cuida: `test/bank.test.ts` revisa ids repetidos, opciones
 duplicadas dentro de una pregunta, enunciados repetidos, categorías inexistentes,
 mínimo de preguntas por categoría y reparto de dificultades. En Mentiroso además
@@ -278,7 +279,38 @@ cerradas.
 
 ---
 
-## 7. La Noche · reglas actuales
+## 7. Superlativos · reglas actuales
+
+Una consigna absurda, todos escriben, todos votan. No hay banco de respuestas
+correctas porque no hay respuesta correcta: el contenido lo ponen ellos.
+
+- Cada voto recibido paga **1000**.
+- Llevarte **todos** los votos que podían ir a tu respuesta paga **1500 extra**,
+  y solo cuenta si había al menos dos votantes en juego.
+- Nadie puede votarse a sí mismo, y el reducer lo rechaza aunque el celu lo mande.
+- El que no escribió **vota igual**: quedarse afuera de una ronda no te saca del
+  juego, solo te deja sin puntos.
+- Dos personas que escriben exactamente lo mismo comparten una sola opción y
+  cobran las dos. Con consignas abiertas casi no pasa, pero cuando pasa es
+  gracioso y no se puede romper.
+
+**Tonos.** `clasico`, `nerd` y `personal`, elegibles desde el lobby. Las del tono
+`personal` llevan `{jugador}`, que se reemplaza por alguien de la mesa elegido al
+azar con el rng sembrado. **El elegido también responde**: es la mitad del chiste.
+
+**Medallas:** Superlativo, Arrasador, Grillos, Novelista, Fantasma.
+
+En la tele las respuestas se destapan **de menos a más votada**, y el autor
+aparece un toque después que el texto: primero la risa, después el culpable.
+Mientras escriben no hay nada que mirar, así que la espera es el show: una carta
+por cabeza que se prende cuando esa persona manda lo suyo.
+
+Los bots distinguen Superlativos de Mentiroso por una seña: **solo las consignas
+de Mentiroso llevan `____`**. Hay un test del banco que lo defiende.
+
+---
+
+## 8. La Noche · reglas actuales
 
 No es un juego: es una secuencia de juegos, y por eso **no implementa
 `GameModule`**. La orquesta la sala, que es la única que puede arrancar y
@@ -306,7 +338,7 @@ completas seguidas eran interminables. El jefe además escala su vida con
 
 ---
 
-## 8. Hoja de ruta
+## 9. Hoja de ruta
 
 ### Mecánicas para sumar (ordenadas por relación diversión/esfuerzo)
 
@@ -346,7 +378,7 @@ completas seguidas eran interminables. El jefe además escala su vida con
 
 ---
 
-## 9. Cosas que ya están resueltas y conviene no romper
+## 10. Cosas que ya están resueltas y conviene no romper
 
 - **Reconexión.** El celular guarda su sesión: si se bloquea la pantalla o se
   recarga la página, vuelve a la partida con sus monedas. La tele también se

@@ -50,6 +50,33 @@ const LIES = [
   'chapa y pintura',
 ];
 
+/**
+ * Respuestas para Superlativos. Acá no hay nada que saber: alcanza con que
+ * suenen a algo que escribiría alguien apurado y medio dormido.
+ */
+const QUIPS = [
+  'mi tío',
+  'un tupper sin tapa',
+  'el olor a lavandina',
+  'gritar y salir corriendo',
+  'una factura de gas',
+  'Ricardo',
+  'el ruido del módem',
+  'dos milanesas frías',
+  'nada, justamente',
+  'un currículum en Comic Sans',
+  'la sopa',
+  'perder el colectivo',
+  'un pendrive con virus',
+  'aplaudir en el momento equivocado',
+  'el vecino del tercero',
+  'una siesta de once horas',
+  'medio limón',
+  'llorar en el bondi',
+  'la impresora',
+  'un audio de siete minutos',
+];
+
 export type BotPlan =
   | { kind: 'once'; delayMs: number; action: PlayerAction }
   | { kind: 'mash'; intervalMs: number; durationMs: number };
@@ -114,7 +141,12 @@ export function decide(view: PlayerView, brain: Brain): BotPlan | null {
   }
 
   if (view.kind === 'text') {
-    const text = view.numeric ? priceGuessFor(view.prompt, brain.accuracy) : pick(LIES);
+    // Las consignas de Mentiroso son las únicas que traen hueco: sirve de seña.
+    const text = view.numeric
+      ? priceGuessFor(view.prompt, brain.accuracy)
+      : view.prompt.includes('____')
+        ? pick(LIES)
+        : pick(QUIPS);
     return { kind: 'once', delayMs: Math.min(wait, 6000), action: { t: 'submitText', text } };
   }
 

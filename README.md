@@ -3,7 +3,7 @@
 Central de juegos para jugar en la tele con el celular como control.
 La tele muestra el tablero, cada uno entra desde su celu escaneando un QR.
 
-Cuatro juegos, y un modo que los encadena:
+Cinco juegos, y un modo que los encadena:
 
 - **Trivia Caótica** — todos contra todos. Monedas, estrellas por categoría que
   se roban entre ustedes, y doce modificadores que rompen las reglas cada par de rondas.
@@ -15,6 +15,9 @@ Cuatro juegos, y un modo que los encadena:
   verdad entre las de los demás.
 - **El Precio Justo** — una pregunta numérica, todos tiran un número y se revelan
   juntos en una recta. Gana el que menos se aleja, con bonus para el que la clava.
+- **Superlativos** — una consigna absurda, todos escriben lo que se les canta y
+  después votan la mejor sin saber de quién es. Acá no hay respuesta correcta:
+  gana el que hace reír. Algunas consignas son sobre alguien de la mesa.
 - **La Noche** — varios juegos seguidos con un solo campeón. Cada uno reparte
   pasos según el puesto, entre juego y juego cae un evento que castiga al que va
   ganando, y el último vale doble.
@@ -180,7 +183,7 @@ ritmo de una noche.
 packages/
   protocol/   tipos compartidos: el contrato entre server, tele y celular
   engine/     salas, jugadores, timers y el contrato GameModule (no sabe de juegos)
-  games/      trivia + jefe final + mentiroso + el precio justo + los bancos
+  games/      trivia + jefe final + mentiroso + el precio justo + superlativos
 apps/
   server/     socket.io, salas en memoria, sirve las dos apps en producción
   host/       la tele (React + Vite)
@@ -210,9 +213,9 @@ Los detalles de cómo sumar juegos, mecánicas y preguntas están en
 ## Sumar preguntas
 
 El banco arranca con **421 preguntas** repartidas en 12 categorías (35 por tema),
-**120 consignas** para Mentiroso y **68 preguntas numéricas** para El Precio Justo.
-Una partida de trivia usa 12 preguntas y una de jefe hasta 15, así que da para
-varias noches sin repetir.
+**120 consignas** para Mentiroso, **68 preguntas numéricas** para El Precio Justo
+y **118 consignas** para Superlativos. Una partida de trivia usa 12 preguntas y
+una de jefe hasta 15, así que da para varias noches sin repetir.
 
 Para la trivia y el jefe, editá
 [`packages/games/src/trivia/questions.ts`](packages/games/src/trivia/questions.ts).
@@ -236,4 +239,14 @@ Para Mentiroso, las consignas están en
 { id: 'lvj6', category: 'videojuegos',
   text: 'El primer nombre de la consola PlayStation fue ____',
   answer: 'Nintendo PlayStation' },
+```
+
+Para Superlativos van en
+[`packages/games/src/quips/prompts.ts`](packages/games/src/quips/prompts.ts). No
+llevan respuesta: solo tienen que dar pie. Las del tono `personal` usan
+`{jugador}`, que se reemplaza por alguien de la mesa al azar:
+
+```ts
+{ id: 'qp35', tone: 'personal',
+  text: 'Lo que googlea {jugador} cuando no puede dormir' },
 ```
