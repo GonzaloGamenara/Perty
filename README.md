@@ -3,7 +3,7 @@
 Central de juegos para jugar en la tele con el celular como control.
 La tele muestra el tablero, cada uno entra desde su celu escaneando un QR.
 
-Cuatro juegos por ahora:
+Cuatro juegos, y un modo que los encadena:
 
 - **Trivia Caótica** — todos contra todos. Monedas, estrellas por categoría que
   se roban entre ustedes, y doce modificadores que rompen las reglas cada par de rondas.
@@ -15,6 +15,9 @@ Cuatro juegos por ahora:
   verdad entre las de los demás.
 - **El Precio Justo** — una pregunta numérica, todos tiran un número y se revelan
   juntos en una recta. Gana el que menos se aleja, con bonus para el que la clava.
+- **La Noche** — varios juegos seguidos con un solo campeón. Cada uno reparte
+  pasos según el puesto, entre juego y juego cae un evento que castiga al que va
+  ganando, y el último vale doble.
 
 ---
 

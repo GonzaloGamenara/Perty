@@ -278,7 +278,35 @@ cerradas.
 
 ---
 
-## 7. Hoja de ruta
+## 7. La Noche · reglas actuales
+
+No es un juego: es una secuencia de juegos, y por eso **no implementa
+`GameModule`**. La orquesta la sala, que es la única que puede arrancar y
+terminar juegos. Vive en `packages/engine/src/night.ts` y no sabe qué juegos
+existen: recibe ids y resultados, y decide qué sigue.
+
+**Ronda:** tablero → juego → tablero con los pasos ganados → evento → juego…
+hasta el último, y final.
+
+- Cada juego reparte **4/3/2/1 pasos** por puesto. Todos suman algo: nadie se
+  queda clavado mirando cómo gana otro.
+- Entre juego y juego cae un **evento**: peaje al que va primero, viento de cola
+  para el último, cambio de lugar entre el primero y el último, todo o nada
+  (el próximo juego vale doble), atajo para los del medio.
+- El **último juego vale doble**, así la noche se puede dar vuelta al final.
+
+**El tablero es un dibujo, no una mecánica.** En Mario Party mover fichas se
+lleva más de la mitad del tiempo y es la parte que la gente saltea. Acá las
+fichas avanzan solas según cómo salió cada uno: se ve el recorrido, pero no se
+pierde un segundo en él.
+
+Cada juego declara su **versión corta** con `quickConfig()`: cuatro partidas
+completas seguidas eran interminables. El jefe además escala su vida con
+`hpScale`, porque con menos rondas y la misma vida era imposible de matar.
+
+---
+
+## 8. Hoja de ruta
 
 ### Mecánicas para sumar (ordenadas por relación diversión/esfuerzo)
 
@@ -318,7 +346,7 @@ cerradas.
 
 ---
 
-## 8. Cosas que ya están resueltas y conviene no romper
+## 9. Cosas que ya están resueltas y conviene no romper
 
 - **Reconexión.** El celular guarda su sesión: si se bloquea la pantalla o se
   recarga la página, vuelve a la partida con sus monedas. La tele también se
